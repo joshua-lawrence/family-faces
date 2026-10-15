@@ -1,0 +1,17 @@
+/* Imports: the latest import's report, "Added just now", new-name hints, files the Inbox can't import */
+.imp-report { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 0 0 18px; max-width: 860px; }
+.imp-report h2 { font: 600 17px var(--display); margin: 0 0 6px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.imp-report h3 { font: 600 14px var(--body); margin: 12px 0 4px; }
+.imp-report p { margin: 0; }
+.imp-report ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6; }
+.imp-report li { overflow-wrap: anywhere; }
+.imp-report .btn { margin-left: 6px; }
+.linkish { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+.imp-run-tag { display: inline-block; margin-left: 8px; padding: 2px 9px; border-radius: 99px; font: 600 12px var(--body);
+  color: var(--accent); background: var(--accent-soft); vertical-align: middle; }
+.imp-run-note { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 0 0 10px; font-size: 13px; }
+.imp-new { display: block; font-size: 12px; min-height: 0; margin-top: 3px; }
+.imp-new:empty { display: none; }
+.inbox-skipped { display: block; margin-top: 6px; font-size: 12px; }
+/* The sidebar scrolls if the Inbox box grows (a long import report, files it can't import) instead of covering the nav. */
+@media (min-width: 821px) { .side { overflow-y: auto; overscroll-behavior: contain; } .side > nav { flex: none; } }

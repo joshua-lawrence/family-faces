@@ -1,0 +1,9 @@
+.fs-upload-connection { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 16px 24px;
+  margin: 0 24px 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--chip); }
+.fs-upload-connection > div { flex: 1 1 260px; min-width: 0; }
+.fs-upload-connection p { margin: 6px 0 0; overflow-wrap: anywhere; }
+.fs-upload-connection .btn { min-height: 40px; white-space: normal; }
+#fs-connection-status.error { color: var(--danger); }
+@media (max-width: 700px) {
+  .fs-upload-connection { margin-inline: 16px; padding: 12px 16px; }
+}

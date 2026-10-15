@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.venv
+.venv-*
+
+# Your photos and everything the app learns from them stay out of the repo
+data/
+.family-faces/
+models/
+originals_before_rotation/
+*.jpg
+*.jpeg
+*.png
+*.heic
+*.tif
+*.tiff
+*.webp
+*.npy
+*.mp4
+!docs/**/*.png
+
+# Local tools
+.impeccable/
+.DS_Store

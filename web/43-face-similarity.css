@@ -1,0 +1,65 @@
+.fsim { margin: 0 0 24px; min-width: 0; }
+details.fsim { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.fsim > summary { cursor: pointer; padding: 16px 0; font: 600 18px var(--display); }
+.fsim > summary .meta { margin-left: 12px; font: 400 13px var(--body); }
+.fsim-body { max-width: 1100px; padding-bottom: 18px; }
+.fsim label { display: grid; gap: 6px; font-size: 13px; font-weight: 500; min-width: 0; }
+.fsim input:not([type="range"]):not([type="checkbox"]), .fsim select { width: 100%; min-width: 0; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--ink); font: 400 16px var(--body); }
+.fsim :is(input,select,button,a,summary):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.fsim .btn { min-height: 44px; }
+.fsim :is(button,input,select):disabled { opacity: .5; cursor: default; }
+.fsim .btn:disabled:hover { background: var(--card); border-color: var(--line); color: var(--ink); }
+.fsim [hidden] { display: none !important; }
+.fsim-pickers { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-items: start; gap: 16px; margin-bottom: 20px; }
+.fsim-comparison-controls { display: grid; grid-template-columns: minmax(0,1fr) 240px; align-items: start; gap: 20px; }
+.fsim-window { min-width: 0; margin: 0 0 20px; padding: 16px 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.fsim-window legend { padding: 0 6px; font-weight: 600; }
+.fsim-window-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.fsim-window-head output { font: 600 22px var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+.fsim-window-head label { display: flex; align-items: center; gap: 10px; }
+.fsim-window-head select { width: auto; }
+.fsim-slider-label { display: block; margin-top: 14px; font-size: 13px; }
+.fsim input[type="range"] { display: block; width: 100%; min-height: 44px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.fsim input[type="range"]:disabled { cursor: default; }
+.fsim-window-steps { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.fsim-window-steps p { text-align: center; margin: 0; max-width: 55ch; }
+.fsim-reference-controls { display: grid; gap: 16px; margin-bottom: 20px; padding-top: 6px; }
+.fsim-custom { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.fsim-custom input { max-width: 140px; }
+.fsim-filters { margin-bottom: 16px; }
+.fsim-filters > summary { cursor: pointer; padding: 8px 0; font-weight: 500; }
+.fsim-filter-fields { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; padding-top: 12px; }
+.fsim .fsim-check { display: flex; align-items: center; gap: 8px; min-height: 44px; align-self: end; }
+.fsim-check input { width: 20px; height: 20px; accent-color: var(--accent); }
+.fsim-result-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 20px; }
+.fsim-result-head p { margin: 0; }
+.fsim-reference { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.fsim-reference h3 { font: 600 20px var(--display); margin: 0 0 4px; }
+.fsim-reference p { margin: 0; }
+.fsim-faces { display: flex; flex-wrap: wrap; gap: 8px; }
+.fsim-face { display: grid; gap: 2px; width: 72px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font: 400 11px var(--body); cursor: pointer; text-align: center; }
+.fsim-face img { width: 72px; height: 80px; object-fit: cover; border-radius: 6px; }
+.fsim-face:hover { color: var(--ink); }
+.fsim-list { list-style: none; padding: 0; margin: 0 0 16px; }
+.fsim-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(180px,320px) 84px; align-items: center; gap: 16px; border-bottom: 1px solid var(--line); padding: 16px 0; }
+.fsim-person { min-width: 0; }
+.fsim-person > a:first-child { font: 600 17px var(--display); color: var(--ink); overflow-wrap: anywhere; }
+.fsim-person p { margin: 4px 0; }
+.fsim-portrait-link { font-size: 13px; color: var(--accent); }
+.fsim-score { display: grid; gap: 2px; text-align: right; }
+.fsim-score b { font: 600 22px var(--mono); color: var(--stamp-text); }
+.fsim-score span { color: var(--muted); font-size: 12px; }
+.fsim-count { margin-left: 12px; }
+@media (max-width: 700px) {
+  .fsim-comparison-controls { display: block; }
+  .fsim-pickers, .fsim-filter-fields { grid-template-columns: 1fr; }
+  .fsim-window { padding: 12px; }
+  .fsim-window-steps { flex-wrap: wrap; }
+  .fsim-window-steps p { order: 3; flex-basis: 100%; text-align: left; }
+  .fsim-window-steps .btn { flex: 1; }
+  .fsim-row { grid-template-columns: minmax(0,1fr) 84px; gap: 12px; }
+  .fsim-row .fsim-faces { grid-column: 1 / -1; grid-row: 2; }
+  .fsim-reference { align-items: start; }
+  .fsim-result-head { align-items: start; }
+  .fsim > summary .meta { display: block; margin: 4px 0 0; }
+}

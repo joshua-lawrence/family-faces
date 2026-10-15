@@ -1,0 +1,64 @@
+/* Toasts with an action (Undo / Redo) — see toast() in review.html */
+.toast { display: flex; align-items: center; gap: 14px; width: max-content; max-width: min(620px, calc(100vw - 32px)); }
+.toast.has-action { padding: 6px 6px 6px 18px; }
+.toast-msg { min-width: 0; overflow-wrap: anywhere; }
+.toast-action { flex: none; height: 32px; padding: 0 15px; border: 0; border-radius: 99px; cursor: pointer;
+  font: 600 13px var(--body); color: color-mix(in srgb, var(--accent) 50%, var(--card));
+  background: color-mix(in srgb, var(--card) 13%, transparent); }
+.toast-action:hover { background: color-mix(in srgb, var(--card) 22%, transparent); }
+.toast-action:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.toast-action:disabled { cursor: default; }
+.toast.warn .toast-action { color: inherit; background: rgba(0, 0, 0, .12); }
+.toast-close { flex: none; width: 32px; height: 32px; border: 0; border-radius: 99px; cursor: pointer; font: 500 18px/1 var(--body);
+  color: inherit; background: transparent; }
+.toast-close:hover { background: color-mix(in srgb, var(--card) 18%, transparent); }
+.toast-close:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.toast.sticky { padding-right: 6px; }
+@media (prefers-color-scheme: dark) {   /* the toast is light here: a deeper blue keeps the text readable */
+  .toast-action { color: color-mix(in srgb, var(--accent) 40%, var(--card)); }
+}
+
+/* History tab */
+.hist { max-width: 860px; }
+.hist .help { margin-bottom: 6px; }
+.hist-keys { margin: 0 0 18px; }
+.hist-keys kbd { display: inline-block; min-width: 22px; padding: 1px 6px; margin: 0 1px; text-align: center;
+  font: 500 11.5px/18px var(--mono); color: var(--ink); background: var(--card);
+  border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; }
+.hist-backups { display: flex; gap: 14px; align-items: flex-start; margin: 0 0 8px; padding: 14px 18px;
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); }
+.hist-backups svg { flex: none; width: 22px; height: 22px; margin-top: 1px; fill: none; stroke: var(--accent);
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.hist-backups h2 { font: 600 14px/22px var(--body); margin: 0; }
+.hist-backups .meta { margin: 2px 0 0; line-height: 1.5; }
+.hist-backups .meta b { color: var(--stamp-text); font-weight: 600; }
+.hist-backups code { font: 500 12px var(--mono); overflow-wrap: anywhere; }
+.hist-day { font: 600 13px/1.3 var(--body); color: var(--muted); margin: 26px 0 4px; letter-spacing: 0; }
+.hist-list { list-style: none; margin: 0; padding: 0; }
+.hist-row { display: grid; grid-template-columns: 74px minmax(0, 1fr) auto; gap: 2px 16px; align-items: start;
+  padding: 14px 4px; border-bottom: 1px solid var(--line); }
+.hist-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+.hist-time { font: 500 13px/22px var(--mono); color: var(--stamp-text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.hist-action { margin: 0; font: 500 15px/22px var(--body); color: var(--ink); overflow-wrap: anywhere; }
+.hist-counts { margin: 2px 0 0; }
+.hist-counts b { font: 600 12.5px var(--mono); color: var(--ink); }
+.hist-reason { margin: 4px 0 0; font-size: 12.5px; color: var(--muted); }
+.hist-faces { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 10px; }
+.hist-faces img { width: 34px; height: 34px; border-radius: 9px; object-fit: cover; background: var(--chip);
+  outline: 1px solid var(--photo-outline); outline-offset: -1px; }
+.hist-more { padding-left: 4px; font: 600 12px var(--mono); color: var(--muted); }
+.hist-do { display: flex; align-items: center; min-height: 34px; }
+.hist-status { padding: 3px 11px; border-radius: 99px; background: var(--chip); color: var(--muted); font: 500 12.5px var(--body); }
+.hist-row.is-undo .hist-action { color: var(--muted); }
+.hist-row.is-undone .hist-action { color: var(--muted); text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--muted) 55%, transparent); }
+.hist-row.is-undone .hist-faces img { opacity: .45; }
+.hist-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+#hist-more { margin-top: 18px; }
+@media (max-width: 560px) {
+  .hist-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "time do" "body body"; gap: 2px 12px; }
+  .hist-time { grid-area: time; align-self: center; }
+  .hist-body { grid-area: body; }
+  .hist-do { grid-area: do; }
+  .hist-backups { padding: 12px 14px; }
+}

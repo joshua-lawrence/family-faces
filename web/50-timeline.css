@@ -1,0 +1,144 @@
+/* Timeline tab (web/50-timeline.js) */
+.tl { min-width: 0; }
+.tl [hidden] { display: none !important; }
+.tl .help { margin-bottom: 18px; }
+.tl-controls { display: grid; grid-template-columns: minmax(0, 420px); gap: 6px; margin-bottom: 14px; }
+.tl-person { font-size: 13px; font-weight: 600; }
+.tl-person-row { display: flex; gap: 8px; align-items: center; }
+.tl-person-row input.name { flex: 1; min-width: 0; width: auto; height: 40px; }
+.tl-person-row .btn { height: 40px; }
+.tl-person-msg { margin: 0; min-height: 0; color: var(--danger); }
+.tl-person-msg:empty { display: none; }
+
+.tl-summary p { margin: 0 0 4px; font-size: 14px; line-height: 1.6; }
+.tl-summary .tl-num { font: 600 15px var(--mono); color: var(--stamp-text); }
+.tl-summary .tl-who { font: 650 16px var(--display); letter-spacing: -.01em; }
+.tl-summary .tl-life { font: 500 13px var(--mono); color: var(--muted); }
+.btn.link.tl-undated-link { height: auto; padding: 0; margin-left: 4px; font-size: 14px; color: var(--accent); text-decoration: underline;
+  text-underline-offset: 3px; white-space: normal; text-align: left; display: inline; }
+.btn.link.tl-undated-link:hover { color: var(--ink); }
+
+/* the ruler: one bar per decade, scaled by photo count, on a baseline with ticks */
+.tl-ruler-wrap { position: relative; margin: 16px 0 26px; border-radius: var(--radius); background: var(--paper); padding: 14px 12px 6px; }
+/* more decades off to one side: fade that edge so the ruler reads as scrollable */
+.tl-ruler-wrap::before, .tl-ruler-wrap::after { content: ""; position: absolute; top: 0; bottom: 0; width: 44px; pointer-events: none; z-index: 1;
+  opacity: 0; transition: opacity .15s; }
+.tl-ruler-wrap::before { left: 0; border-radius: var(--radius) 0 0 var(--radius); background: linear-gradient(to right, var(--paper) 20%, transparent); }
+.tl-ruler-wrap::after { right: 0; border-radius: 0 var(--radius) var(--radius) 0; background: linear-gradient(to left, var(--paper) 20%, transparent); }
+.tl-ruler-wrap.more-left::before, .tl-ruler-wrap.more-right::after { opacity: 1; }
+.tl-ruler { position: relative; display: flex; gap: 2px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; padding: 2px 2px 4px; }
+.tl-dec { scroll-snap-align: start; flex: 1 0 46px; display: grid; grid-template-rows: 72px auto auto; justify-items: center; gap: 2px; padding: 6px 2px 6px;
+  border: 0; border-radius: 10px; background: none; color: var(--ink); font: inherit; cursor: pointer; position: relative; }
+.tl-dec::after { content: ""; position: absolute; left: 0; right: 0; top: 84px; height: 1px; background: color-mix(in srgb, var(--muted) 45%, transparent); }
+.tl-dec::before { content: ""; position: absolute; left: 50%; top: 80px; width: 1px; height: 8px; background: color-mix(in srgb, var(--muted) 60%, transparent); }
+.tl-bar { width: 26px; height: 72px; display: flex; flex-direction: column; justify-content: flex-end; }
+.tl-bar i.tl-rough { border-radius: 6px 6px 0 0; opacity: .4; }
+.tl-bar i.tl-dated.under { border-radius: 0 0 2px 2px; }
+.tl-dec-n small { display: block; font-size: 10px; font-weight: 500; color: var(--muted); line-height: 1.1; }
+.tl-bar i { display: block; width: 100%; border-radius: 6px 6px 2px 2px; background: color-mix(in srgb, var(--ink) 22%, var(--paper)); transition: background .15s; }
+.tl-dec-n { font: 600 12px var(--mono); color: var(--stamp-text); margin-top: 8px; min-height: 16px; font-variant-numeric: tabular-nums; }
+.tl-dec-y { font: 500 12.5px var(--body); color: var(--muted); white-space: nowrap; }
+.tl-dec:hover:not(:disabled) { background: color-mix(in srgb, var(--card) 70%, transparent); }
+.tl-dec:hover:not(:disabled) .tl-bar i { background: color-mix(in srgb, var(--accent) 55%, var(--paper)); }
+.tl-dec.on { background: var(--card); box-shadow: var(--shadow); }
+.tl-dec.on .tl-bar i { background: var(--accent); }
+.tl-dec.on .tl-dec-y { color: var(--ink); font-weight: 600; }
+.tl-dec:disabled { cursor: default; }
+.tl-dec:disabled .tl-dec-y { opacity: .6; }
+.tl-dec.life::after { height: 3px; top: 83px; background: var(--accent); }
+.tl-dec:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.tl-dec.tl-undated { margin-left: 12px; flex: 0 0 64px; }
+.tl-dec.tl-undated::after, .tl-dec.tl-undated::before { display: none; }
+.tl-dec.tl-undated .tl-bar { border: 1.5px dashed color-mix(in srgb, var(--muted) 60%, transparent); border-radius: 6px; width: 26px; height: 40px; align-self: end; }
+.tl-dec.tl-undated .tl-bar i { display: none; }
+.tl-dec.tl-undated .tl-dec-n { color: var(--muted); }
+.tl-dec.tl-undated.on .tl-bar { border-color: var(--accent); }
+
+/* decade and year views */
+.tl-row { margin-bottom: 30px; }
+.tl-row-head, .tl-dhead { display: flex; align-items: baseline; gap: 10px 14px; flex-wrap: wrap; margin-bottom: 12px; }
+.tl-row-head h3 { font: 650 22px/1.1 var(--display); letter-spacing: -.02em; margin: 0; }
+.tl-row-head .btn { margin-left: auto; align-self: center; }
+.tl-dhead h2 { font: 650 30px/1.1 var(--display); letter-spacing: -.02em; margin: 0; }
+.tl-dhead .tl-step { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; align-self: center; }
+.tl-row-head .meta b, .tl-dhead .meta b { color: var(--stamp-text); font-size: 13px; }
+.tl-years { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 22px; }
+.tl-years .chip { font-variant-numeric: tabular-nums; cursor: pointer; }
+.tl-years .chip small { margin-left: 6px; }
+.tl-years .tl-none { opacity: .45; cursor: default; background: none; border: 1px dashed var(--line); }
+.tl-years .tl-none:hover { background: none; border-color: var(--line); }
+.tl-year { margin-bottom: 30px; scroll-margin-top: 16px; }
+.tl-year h3 { display: flex; align-items: baseline; gap: 10px; font: 600 20px var(--mono); color: var(--ink); letter-spacing: -.02em; margin: 0 0 12px;
+  padding-top: 14px; border-top: 1px solid var(--line); }
+.tl-year h3 .meta { font-family: var(--body); letter-spacing: 0; }
+.tl-more { margin-top: 14px; }
+
+.tl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px 14px; }
+.tl-strip { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); grid-auto-rows: auto; }
+.tl-photo, .tl-card { margin: 0; min-width: 0; }
+.tl-open { display: block; width: 100%; padding: 0; border: 0; border-radius: 12px; overflow: hidden; background: var(--paper); cursor: zoom-in; }
+.tl-open img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; outline: 1px solid var(--photo-outline); outline-offset: -1px; border-radius: 12px; }
+.tl-open:hover img { filter: brightness(1.04); }
+.tl-open:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tl-photo figcaption, .tl-card figcaption { text-align: left; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin-top: 7px; font-size: 12.5px; line-height: 1.4; }
+.tl-when { font: 600 12.5px var(--mono); color: var(--stamp-text); font-variant-numeric: tabular-nums; }
+.tl-when.rough { color: var(--muted); font-weight: 500; }
+.tl-age { font: 500 12px var(--mono); color: var(--ink); }
+.tl-src { font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; padding: 0 6px; line-height: 16px; }
+.tl-cap { flex-basis: 100%; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+.tl-cap.none { font-style: italic; }
+
+/* photos that could use a date */
+.tl-undated-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px 16px; }
+.tl-card figcaption { flex-direction: column; align-items: stretch; gap: 4px; }
+.tl-card .meta a { color: var(--accent); text-underline-offset: 3px; }
+.tl-card .tl-cap { color: var(--ink); }
+.tl-date-form { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+.tl-date-form label { display: flex; gap: 6px; align-items: center; font-size: 12.5px; color: var(--muted); }
+.tl-date-form input.name { width: 76px; height: 34px; padding: 0 10px; font: 500 14px var(--mono); }
+.tl-date-form input.name::placeholder { color: var(--muted); opacity: .7; }
+.tl-card.done .tl-open img { opacity: .55; }
+
+/* birth years that would date the most photos */
+.tl-who-panel { margin: 0 0 26px; padding: 14px 16px 6px; border-radius: var(--radius); background: var(--paper); }
+.tl-who-panel h3 { font: 600 14px var(--body); margin: 0 0 6px; }
+.tl-who-panel ul { list-style: none; margin: 0; padding: 0; }
+.tl-who-panel li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 8px 0; border-top: 1px solid var(--line); }
+.tl-who-panel li:first-child { border-top: 0; }
+.tl-who-name { font-size: 14px; font-weight: 550; min-width: 0; flex: 1 1 180px; }
+.tl-who-name a { color: var(--ink); text-underline-offset: 3px; }
+.tl-who-panel .meta { flex: 0 0 auto; min-width: 84px; }
+.tl-who-panel .meta b { font: 600 13px var(--mono); color: var(--stamp-text); }
+.tl-who-panel .tl-date-form { margin-top: 0; }
+.tl-who-panel .btn { height: 34px; }
+.tl-saved { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+.modal .cap .tl-modal-date b { font-family: var(--mono); color: var(--stamp-text); }
+
+@media (max-width: 640px) {
+  .tl-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 10px; }
+  .tl-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tl-strip .tl-photo:nth-child(n+7) { display: none; }
+  .tl-strip figcaption .tl-cap, .tl-strip .tl-src { display: none; }
+  .tl-undated-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 10px; }
+  .tl-dhead h2 { font-size: 24px; }
+  .tl-dhead .tl-step { margin-left: 0; width: 100%; }
+  .tl-ruler-wrap { margin-left: -6px; margin-right: -6px; padding: 10px 6px 4px; }
+  .tl-dec { flex-basis: 52px; }
+  .tl-date-form { flex-wrap: wrap; }
+  .tl-who-panel { padding: 12px 12px 4px; }
+  .tl-who-name { flex-basis: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .tl-bar i, .tl-ruler-wrap::before, .tl-ruler-wrap::after { transition: none; } }
+
+/* Reserve the same metadata rows even when a date label is long. */
+.tl-photo figcaption { display: block; }
+.tl-card-meta { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+.tl-card-meta .tl-when { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.tl-card-meta .tl-age { flex-shrink: 0; }
+.tl-source-line { display: block; min-height: 20px; }
+.tl-source-line .tl-src { display: inline-block; white-space: nowrap; }
+.tl-scroll-help { display: none; }
+@media (max-width: 640px) {
+  .tl-scroll-help { display: block; margin: -18px 0 22px; }
+}

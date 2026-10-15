@@ -1,0 +1,176 @@
+/* Polish: small layout fixes that apply across tabs (loaded after review.html's own styles). */
+
+/* Link buttons (Save video, Export GEDCOM) line up with real buttons */
+a.btn { display: inline-flex; align-items: center; justify-content: center; }
+
+/* Portraits video players: Play and Save video side by side, speed fills the rest */
+.player .video-controls { flex-wrap: nowrap; }
+.player .video-controls .speed { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; justify-content: flex-end; }
+.player .video-controls .speed input { width: 100%; max-width: 90px; min-width: 48px; accent-color: var(--accent); }
+.gen-controls { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+
+/* Family tree: toolbar is a frosted strip along the top of the stage, so cards never sit under the buttons */
+.tree-tools { left: 0; right: 0; top: 0; padding: 10px 12px; gap: 8px; align-items: center;
+              background: color-mix(in srgb, var(--card) 86%, transparent); backdrop-filter: blur(8px);
+              -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.tree-tools input.name { flex: 1 1 130px; width: auto; min-width: 110px; max-width: 240px; }
+.tree-tools .btn:disabled { opacity: .45; cursor: default; }
+.tree-actions { display: contents; }
+/* and a short glide when centring or showing the whole tree */
+.tree-world.tree-anim { transition: transform .24s cubic-bezier(.2, .7, .2, 1); }
+
+/* Gallery: a typed or linked name that matches no one */
+.gallery-nomatch { display: grid; gap: 8px; padding: 12px 14px; border-radius: 12px; background: var(--chip);
+                   border: 1px solid var(--line); font-size: 13px; max-width: 760px; }
+.gallery-nomatch p { margin: 0; }
+.gallery-nomatch .gallery-suggest { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.gallery-nomatch .btn small { font: 600 11px var(--mono); color: var(--stamp-text); }
+.photo-gallery-selected:empty { display: none; }
+#gallery-messages { display: grid; gap: 8px; }
+#gallery-messages:empty { display: none; }
+
+/* Groups: FamilySearch source choices wrap inside the row instead of pushing the page wider */
+.source-hints .source-choice { min-width: 0; max-width: 100%; }
+.source-hints .source-choice > button { flex: 0 1 auto; min-width: 0; height: auto; white-space: normal; overflow-wrap: anywhere; text-align: left; }
+.source-hints .source-choice a { flex: none; white-space: nowrap; }
+
+/* ---------- Phones and narrow windows ---------- */
+@media (max-width: 820px) {
+  /* Tabs: one scrolling row that never covers the page below it */
+  .side { position: relative; z-index: 1; }
+  nav#tabs { flex: none; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain;
+             scrollbar-width: none; scroll-padding-inline: 12px; margin: 0 -12px; padding: 2px 12px 6px; }
+  nav#tabs::-webkit-scrollbar { display: none; }
+  nav#tabs { -webkit-mask-image: linear-gradient(to right, transparent, #000 12px, #000 calc(100% - 28px), transparent);
+             mask-image: linear-gradient(to right, transparent, #000 12px, #000 calc(100% - 28px), transparent); }
+  nav#tabs button { flex: none; }
+  /* An empty Inbox card is just noise on a phone; it comes back when there is something to import */
+  .side-foot .inbox:not(:has(button)) { display: none; }
+  .side-foot:not(:has(.inbox button)) { display: none; }
+  /* Phones: find box on top, the other tools in one row that scrolls sideways */
+  .tree-tools { padding: 10px 0 8px; gap: 8px; flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
+  .tree-tools input.name { flex: none; width: auto; max-width: none; margin: 0 10px; }
+  .tree-actions { display: flex; gap: 6px; overflow-x: auto; padding: 0 10px; scrollbar-width: none; touch-action: pan-x; }
+  .tree-actions::-webkit-scrollbar { display: none; }
+  .tree-actions > * { flex: none; }
+  .tree-stage { height: 72vh; min-height: 440px; }
+}
+
+@media (max-width: 600px) {
+  /* Gallery filters: search box full width, its buttons side by side, then the source */
+  .photo-gallery-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; }
+  .photo-gallery-filters > label:first-child { grid-column: 1 / -1; order: 1; }
+  .photo-gallery-filters > .btn { order: 2; }
+  .photo-gallery-filters > label:not(:first-child) { grid-column: 1 / -1; order: 3; }
+  .photo-gallery-filters select { width: 100%; }
+}
+
+@media (max-width: 640px) {
+  /* Selection bar: two rows, the name field full width and the actions below it.
+     The count sits on the bar's top edge as a small tab. */
+  .floating { left: 12px; right: 12px; bottom: 12px; transform: none; white-space: normal; flex-wrap: wrap;
+              gap: 8px; border-radius: 20px; padding: 12px 12px 10px; }
+  .floating #sel-actions { display: contents; }
+  .floating #sel-count { position: absolute; top: -11px; left: 18px; padding: 2px 10px; border-radius: 99px;
+                         background: var(--accent); color: var(--accent-ink); font: 600 12px/18px var(--body); }
+  .floating #move-to { flex: 1 1 100%; width: 100%; height: 40px; font-size: 16px; }
+  .floating .btn { flex: 1 1 auto; padding-inline: 10px; }
+  .toast { max-width: calc(100vw - 24px); bottom: 16px; }
+  /* Nothing may push the page wider than the screen */
+  .content, main, .page-head { min-width: 0; max-width: 100%; }
+  main { overflow-wrap: break-word; }
+  .map-controls { right: 12px; }
+  .map-controls input.name { flex: 1 1 140px; width: auto; min-width: 0; }
+  .detail-head h2 { font-size: 22px; }
+  .gallery-nomatch { max-width: none; }
+}
+
+/* Touch screens: every chip and button is at least 40px tall */
+@media (pointer: coarse) {
+  .btn, .seg button, nav#tabs button, .drop-setting { min-height: 40px; height: auto; }
+  .btn { padding-block: 8px; }
+  .chip { min-height: 40px; display: inline-flex; align-items: center; padding-block: 6px; }
+  .left .chip { font-size: 13px; }
+  .rel-chip { min-height: 40px; }
+  .rel-chip { padding-right: 0; }
+  .rel-chip button { min-width: 40px; min-height: 40px; font-size: 18px; }
+  .seg { align-items: stretch; }
+  input.name { min-height: 40px; }
+  .photo-gallery-selected .btn, .photo-gallery-mode label, .tree-side input, .tree-side select, #tree-droprel { min-height: 40px; }
+  .photo-gallery-mode { row-gap: 0; }
+}
+
+/* Keyboard access uses the same card and photo styles as pointer access. */
+.skip-link { position: fixed; top: 8px; left: 8px; z-index: 100; transform: translateY(-160%);
+             padding: 8px 14px; border-radius: 99px; background: var(--ink); color: var(--card); }
+.skip-link:focus { transform: none; outline: 2px solid var(--accent); outline-offset: 2px; }
+a.branch, a.gcard, .portrait-link { color: inherit; text-decoration: none; }
+.portrait-link { display: block; }
+.strip button.st { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; }
+.branch:focus-visible, .gcard:focus-visible, .portrait-link:focus-visible, .tcard:focus-visible, .tray-item:focus-visible,
+.strip .st:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rel-chip button { min-width: 24px; min-height: 24px; flex: none; }
+.rel-chip button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: 50%; }
+.tree-link-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.tree-link-editor { display: grid; gap: 8px; margin-top: 12px; }
+.tree-link-editor input.name { width: 100%; }
+.tree-link-editor .controls { display: flex; flex-wrap: wrap; gap: 6px; }
+.tdetail .yrs-in { flex-wrap: wrap; }
+.tdetail .yrs-in label { min-width: 0; flex: 1 1 72px; }
+.tdetail .yrs-in label:has(select) { flex: 1 1 100%; }
+.tdetail .yrs-in select { padding-right: 8px; }
+.tdetail .head .av, .focus-card .head > img { flex: none; }
+
+/* Names must wrap before they can widen a page or grid column. */
+#page-title, .detail-head h2, .pt-section h2, .pt-section h3, .help, .meta, .nm, .branch .cap, figcaption,
+.tcard, .tray-item, .tree-side h2, .tree-side h3, .rel-chip, .hist-action, .toast, .relmenu, .map-tip, .pair .who,
+.empty, .source-hints, .fs-upload-status { overflow-wrap: anywhere; }
+main, .page-head, .detail-head > *, .pt-section, .gallery > *, .branch > *, .grow > *, .alike > *, .blend > *,
+.tree-side, .tree-side > *, .tdetail, .tdetail .head > div, .focus-card .head > div { min-width: 0; max-width: 100%; }
+.rel-chip { max-width: 100%; }
+.tree-side input.name { min-width: 0; }
+.branches { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+.branch { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+.grow { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); }
+.vid-wrap { width: min(300px, 100%); height: auto; aspect-ratio: 4 / 5; }
+.gens, .line-row { min-width: 0; max-width: 100%; }
+
+/* Text fields use a visible border in both themes. */
+::placeholder { color: var(--muted); opacity: 1; }
+input.name, .tdetail .yrs-in input, .tdetail .yrs-in select, .fs-upload-fields textarea,
+.people-filters input, .people-filters select, .photo-gallery-filters select, .review-field select,
+.pv-field textarea, .pv-field input, .pv-name, .sp-input, .nm-sheet input, .imp-pageno input { border-color: var(--field-line); }
+input.name:focus, .tdetail .yrs-in :is(input, select):focus { border-color: var(--accent); }
+
+@media (max-width: 900px) {
+  .tree-wrap { height: auto; grid-template-columns: minmax(0, 1fr); }
+  .tree-side { height: auto; overflow: visible; }
+  .tree-side > * { flex-shrink: 0; }
+  .grow { grid-template-columns: minmax(0, 1fr); }
+  .alike, .blend { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.pm-section { margin: 24px 0 32px; }
+.pm-filters { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0; }
+.pm-filters label { display: grid; gap: 6px; font-size: 13px; font-weight: 500; }
+.pm-filters select { min-height: 40px; padding: 8px 12px; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+.pm-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 20px 16px; }
+.pm-match { min-width: 0; }
+.pm-photo { display: block; width: 100%; padding: 0; border: 0; background: var(--chip); border-radius: var(--radius); overflow: hidden; cursor: pointer; }
+.pm-photo img { display: block; width: 100%; height: 160px; object-fit: contain; }
+.pm-facts { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 10px; font-variant-numeric: tabular-nums; }
+.pm-caption { overflow-wrap: anywhere; margin: 6px 0 10px; }
+.pm-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.pm-actions .btn { min-height: 40px; white-space: normal; }
+.pm-photo:focus-visible, .pm-filters select:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.tcard-select { display: block; width: 100%; padding: 0; background: none; border: 0; color: inherit; font: inherit; cursor: grab; }
+.tcard-select .nm, .tcard-select .yrs { display: block; }
+.tcard-expand { display: grid; gap: 4px; margin-top: 8px; }
+.tcard-expand:empty { display: none; }
+.tcard-expand button { min-height: 40px; padding: 6px 4px; border: 1px solid var(--line); border-radius: 8px; background: var(--chip); color: var(--ink); font: 500 12px var(--body); cursor: pointer; }
+.tcard-select:focus-visible, .tcard-expand button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tree-view-count { position: absolute; z-index: 1; bottom: 8px; left: 12px; margin: 0; padding: 6px 10px; border-radius: 8px; background: var(--card); pointer-events: none; }
+.rel-chip .tree-relative { font: inherit; color: var(--ink); width: auto; height: auto; padding: 5px 2px; text-align: left; }
+
+.fs-upload-choice .meta { display: block; line-height: 1.45; }
+.fs-upload-choice a { display: block; color: var(--accent); font-size: 12px; line-height: 1.45; min-height: 40px; padding-top: 6px; text-underline-offset: 3px; }
+.fs-upload-choice a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

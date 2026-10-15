@@ -1,0 +1,20 @@
+.pv-fs-tags { border-top: 1px solid var(--line); padding-top: 20px; }
+.pv-fs-tags h3 { margin: 0 0 8px; font: 600 16px var(--display); }
+.pv-fs-tags p { margin: 8px 0 12px; }
+.pv-fs-tags fieldset { min-width: 0; padding: 0; border: 0; margin: 20px 0; }
+.pv-fs-tags legend { font-weight: 600; margin-bottom: 8px; }
+.fst-connection { margin-top: 16px; }
+.fst-person { padding: 12px 0; border-top: 1px solid var(--line); }
+.fst-person > label:first-child { display: flex; gap: 8px; align-items: center; min-height: 44px; }
+.fst-person img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
+.fst-person span { min-width: 0; overflow-wrap: anywhere; }
+.fst-id { display: grid; gap: 4px; margin: 8px 0 0 26px; font-size: 12px; color: var(--muted); }
+.fst-id input { width: 100%; min-width: 0; min-height: 40px; font-size: 16px; }
+.fst-preview h4 { margin: 16px 0 8px; font-size: 14px; }
+.fst-preview ul { padding-left: 20px; margin: 0 0 16px; }
+.fst-preview li { margin-bottom: 10px; overflow-wrap: anywhere; }
+.pv-fs-tags .error { color: var(--danger); }
+.pv-fs-tags .btn { min-height: 40px; white-space: normal; }
+
+.pv-fs-tags a { color: var(--accent); text-underline-offset: 3px; overflow-wrap: anywhere; }
+.pv-fs-tags a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
