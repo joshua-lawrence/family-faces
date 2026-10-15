@@ -1,8 +1,8 @@
 # Demo library
 
-The README screenshots use a made-up family, the Hales, drawn with the
+I made up a family, the Hales, for the README screenshots, drawn with the
 [Notionists](https://www.dicebear.com/styles/notionists/) avatar style by Zoish (CC0 1.0, via DiceBear).
-No real photos or real people are involved.
+No real photos or real people are involved, and my own family's photos stay private.
 
 ```bash
 cd tools/demo-library && npm install

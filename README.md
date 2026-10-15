@@ -1,7 +1,11 @@
 # Family Faces
 
-Find every face in your family photos, put names to them, and link the people to a family tree.
-Everything runs on your own computer: your photos and names never leave it.
+I built Family Faces to put names to the people in my family's photo albums: about 18,000 scanned
+photos and more than 42,000 faces across several generations. It finds every face, groups the ones
+that look alike so I can name a whole group at once, and links the people to our family tree.
+
+It runs entirely on your own computer, so your photos and names never leave it. I made it open
+source so other families can do the same with their albums.
 
 - **Finds and groups faces.** Detects faces with InsightFace and groups the ones that look alike,
   so you name a whole group at once.
@@ -21,8 +25,8 @@ Everything runs on your own computer: your photos and names never leave it.
 | ![Home: how much of the library is named, and what to do next](docs/screenshots/home.png) | ![A person's page: photos by decade with their age in each, and close family](docs/screenshots/person.png) |
 | ![Family tree built from the people you name](docs/screenshots/family-tree.png) | ![Timeline: photos dated from captions and the ages of the people in them](docs/screenshots/timeline.png) |
 
-<sub>Screenshots show a made-up family drawn with the CC0 [Notionists](https://www.dicebear.com/styles/notionists/) avatars.
-See [tools/demo-library](tools/demo-library) to rebuild it.</sub>
+<sub>To keep my own family's photos private, these screenshots show a made-up family I drew with the CC0
+[Notionists](https://www.dicebear.com/styles/notionists/) avatars. [tools/demo-library](tools/demo-library) rebuilds it.</sub>
 
 ## Install
 
@@ -78,8 +82,8 @@ Photos, Lightroom or Picasa are read the same way.
 alongside ArcFace. Download the IR-101 WebFace12M weights as
 `~/.insightface/models/adaface_ir101_webface12m.safetensors` first. Then regroup with `uv run python -m family_faces.pipeline.cluster`.
 
-On the author's library of about 18,000 photos, `family_faces/pipeline/bakeoff.py` measured how often a face's nearest
-named face is the right person. The albums were split into five blocks and faces were only matched
+On my own library of about 18,000 photos, I used `family_faces/pipeline/bakeoff.py` to measure how often a face's
+nearest named face is the right person. I split the albums into five blocks and only matched faces
 against other blocks, so a face can't be recognised from the same outfit on the next page.
 
 | Model | All faces | Children under 10 | Faces under 80 px |
