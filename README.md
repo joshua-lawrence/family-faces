@@ -1,10 +1,10 @@
 # Family Faces
 
-I built Family Faces to put names to the people in my family's photo albums: about 18,000 scanned
+I built Family Faces to put names to the people in my family's photo albums: about 18,000
 photos and more than 42,000 faces across several generations. It finds every face, groups the ones
 that look alike so I can name a whole group at once, and links the people to our family tree.
 
-It runs entirely on your own computer, so your photos and names never leave it. I made it open
+It runs entirely on your own computer, so your photos and names never leave it. I am making it open
 source so other families can do the same with their albums.
 
 - **Finds and groups faces.** Detects faces with InsightFace and groups the ones that look alike,
