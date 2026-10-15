@@ -945,6 +945,8 @@ def face_map(snap=None):
 
     Person similarity is the cosine between each person's mean face embedding.
     """
+    if not (DATA / "map.json").exists():
+        return {"missing": True, "people": []}
     snap = snap or Snap()
     faces, emb = snap.faces, snap.emb
     m = json.loads((DATA / "map.json").read_text())

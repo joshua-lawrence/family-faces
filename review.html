@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Family Photo Explorer</title>
+<title>Family Faces</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2315171c'/%3E%3Ccircle cx='11' cy='11' r='4.5' fill='%23fff' fill-opacity='.9'/%3E%3Ccircle cx='21' cy='11' r='4.5' fill='%23f2683c'/%3E%3Ccircle cx='11' cy='21' r='4.5' fill='%23fff' fill-opacity='.9'/%3E%3Ccircle cx='21' cy='21' r='4.5' fill='%23fff' fill-opacity='.9'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -628,7 +628,7 @@
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="shell">
 <aside class="side">
-  <div class="brand"><div class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div><b>Family Photo Explorer</b><span id="brand-library">Family photos</span></div></div>
+  <div class="brand"><div class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div><b>Family Faces</b><span id="brand-library">Family photos</span></div></div>
   <nav id="tabs" aria-label="Pages">
     <div class="nav-label">Name faces</div>
     <button data-tab="groups" class="on" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="lbl">Groups</span><span class="count" id="n-groups"></span></button>
@@ -1211,6 +1211,10 @@ function mapShell() {
 
 async function initMap() {
   M = await (await fetch("/api/map")).json();
+  if (M.missing) {
+    $("#main").innerHTML = `<div class="empty">The map isn't built yet. Run <code>uv run python map.py</code> in the app folder, then reload this page.</div>`;
+    return;
+  }
   if (!atlas) { atlas = new Image(); atlas.src = `/atlas.jpg?v=${S.v}`; atlas.onload = drawMap; }
   for (const p of M.people) if (!avatars[p.rep]) {
     const im = new Image(); im.src = `/thumbs/${p.rep}.jpg?v=${S.v}`; im.onload = drawMap; avatars[p.rep] = im;
@@ -3085,7 +3089,7 @@ function syncURL(replace = false) {
   const h = currentRoute(), fresh = routeJustApplied;
   routeJustApplied = false;
   const sub = decodeURIComponent((h.split("/")[2] || "").split("?")[0]);
-  document.title = [sub, TITLES[tab], "Family Photo Explorer"].filter(Boolean).join(" · ");
+  document.title = [sub, TITLES[tab], "Family Faces"].filter(Boolean).join(" · ");
   if (location.hash === h || routeKey(location.hash) === routeKey(h)) return;   // same page, spelled differently
   history[replace || fresh || !location.hash ? "replaceState" : "pushState"](null, "", h);
 }

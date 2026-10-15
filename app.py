@@ -58,6 +58,7 @@ def main():
         print("Looking for faces in your photos. This runs once; later photos go through the Inbox.")
         run("embed.py")
         run("cluster.py")
+        run("map.py")
     run("serve.py")
 
 

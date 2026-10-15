@@ -221,7 +221,7 @@ function filterSummary(groups) {
   const bits = [];
   if (groups) bits.push({ match: 'Best match first', photos: 'Most photos first', faces: 'Most faces first' }[reviewSettings.sort]);
   bits.push(reviewSettings.minimum ? `${Math.round(reviewSettings.minimum * 100)}%+ match` : 'Any score');
-  bits.push({ maternal: 'Mom’s side', paternal: 'Dad’s side', all: 'All branches', none: 'Album photos only' }[reviewSettings.branch]);
+  if (S?.familysearch_enabled !== false) bits.push({ maternal: 'Mom’s side', paternal: 'Dad’s side', all: 'All branches', none: 'Album photos only' }[reviewSettings.branch]);
   if (showFamilySearchOnly) bits.push('FamilySearch-only groups shown');
   if (groups && showNamed) bits.push('Named groups shown');
   return bits.join(' · ');
@@ -239,7 +239,7 @@ function topHTML(kind, right) {
   const hint = groups
     ? `<kbd>Enter</kbd> save <span>·</span> <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> use a suggestion <span>·</span> <kbd>↑</kbd><kbd>↓</kbd> move between groups <span>·</span> <kbd>Esc</kbd> then <kbd>S</kbd> skip, <kbd>I</kbd> ignore, <kbd>→</kbd> faces, <kbd>P</kbd> photo, <kbd>X</kbd> select, <kbd>N</kbd> name selected ${undo}`
     : `<kbd>Enter</kbd> save <span>·</span> <kbd>1</kbd><kbd>2</kbd> use a suggestion <span>·</span> <kbd>↑</kbd><kbd>↓</kbd> move between faces <span>·</span> <kbd>Esc</kbd> then <kbd>S</kbd> skip, <kbd>I</kbd> ignore, <kbd>P</kbd> photo, <kbd>X</kbd> select, <kbd>N</kbd> name selected ${undo}`;
-  const extra = (groups && reviewSettings.labels ? `<p class="meta">The FamilySearch mark is on photos imported from FamilySearch. Unmarked photos are from your albums.</p>` : '') + (NM.rebuilding ? '' : sourceMatchingScope());
+  const extra = (groups && reviewSettings.labels && S?.familysearch_enabled !== false ? `<p class="meta">The FamilySearch mark is on photos imported from FamilySearch. Unmarked photos are from your albums.</p>` : '') + (NM.rebuilding ? '' : sourceMatchingScope());
   return `<div class="nm-top">
     ${tipHTML(kind)}
     <div class="nm-bar">

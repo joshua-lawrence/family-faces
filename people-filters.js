@@ -28,6 +28,13 @@ function showAllPeopleSearch(query) {
   peopleShown = PEOPLE_PAGE;
   savePeopleFilters();
 }
+function peopleMoreOpen() {
+  try { return localStorage.getItem('family-faces-people-more') === 'open'; } catch { return false; }
+}
+document.addEventListener('toggle', e => {
+  if (!e.target.matches?.('.people-more-filters')) return;
+  try { localStorage.setItem('family-faces-people-more', e.target.open ? 'open' : 'closed'); } catch {}
+}, true);
 function peopleListView() {
   const names = Object.keys({...S.people, ...S.hidden_people});
   peopleRestoreY = scrollY;   // render() restores the scroll before the cards exist; applyPeopleFilters does it after
@@ -35,18 +42,23 @@ function peopleListView() {
   if (!names.length) return '<div class="empty">No one named yet.</div>';
   if (!S.people_tree_names.includes(peopleFilters.root)) peopleFilters.root = S.people_default_root || '';
   const options = (key, rows) => rows.map(([v,label]) => `<option value="${v}" ${peopleFilters[key] === v ? 'selected' : ''}>${label}</option>`).join('');
-  return `<p class="help">People in your albums and family tree. Open a person to see their photos, records, and album faces.</p>
-    <div class="people-filters" aria-label="People filters">
+  const active = [peopleFilters.source !== 'hide-familysearch-only' && peopleFilters.source !== 'all', peopleFilters.distance !== 'any', !peopleFilters.partners].filter(Boolean).length;
+  return `<div class="people-filters people-filters-main" aria-label="Find people">
       <label>Find a person<input id="people-search" type="search" placeholder="Search names…" value="${esc(peopleFilter)}" autocomplete="off"></label>
-      <label>Photo source<select id="people-source">${options('source', [['all','All people'],['all-including-hidden','All people, including FamilySearch tag names'],['hidden','Only FamilySearch tag names'],['hide-familysearch-only','Hide FamilySearch-only people'],['album','Has album photos'],['familysearch-only','FamilySearch photos only'],['none','No photos yet']])}</select></label>
       <label>Sort by<select id="people-list-sort">${options('sort', [['name','Name'],['photos','Most photos'],['distance','Closest family connection']])}</select></label>
+    </div>
+    <details class="people-more-filters" ${peopleMoreOpen() ? 'open' : ''}>
+      <summary>Filters${active ? ` <span class="filter-count">${active}</span>` : ''}</summary>
+      <div class="people-filters" aria-label="People filters">
+      <label>Photo source<select id="people-source">${options('source', [['all','All people'],['all-including-hidden','All people, including FamilySearch tag names'],['hidden','Only FamilySearch tag names'],['hide-familysearch-only','Hide FamilySearch-only people'],['album','Has album photos'],['familysearch-only','FamilySearch photos only'],['none','No photos yet']])}</select></label>
       <label>Related to<input id="people-root" list="people-root-options" placeholder="Choose a person…" value="${esc(peopleFilters.root)}" autocomplete="off" aria-describedby="people-distance-note"></label>
       <label>Relationship distance<select id="people-distance">${options('distance', [['any','Any distance'],['known','Has a known link'],['0','Selected person only'],['1','Within 1 family link'],['2','Within 2 family links'],['3','Within 3 family links'],['4','Within 4 family links'],['6','Within 6 family links'],['unknown','No known link']])}</select></label>
       <label>Connections<select id="people-connections"><option value="true" ${peopleFilters.partners ? 'selected' : ''}>Parents, children, and partners</option><option value="false" ${!peopleFilters.partners ? 'selected' : ''}>Parents and children only</option></select></label>
-    </div>
+      </div>
+      <p class="people-filter-note" id="people-distance-note">One parent, child, or partner connection is one family link. Siblings and grandparents are usually 2 links away; first cousins are usually 4. Distances use the saved tree.</p>
+    </details>
     <datalist id="people-root-options">${S.people_tree_names.map(n => `<option value="${esc(n)}"></option>`).join('')}</datalist>
     ${Object.keys(S.hidden_people || {}).length ? `<p class="people-filter-note">${Object.keys(S.hidden_people).length.toLocaleString()} people named only in FamilySearch tags aren’t shown. Choose “Only FamilySearch tag names” in Photo source to see them.</p>` : ''}
-    <p class="people-filter-note" id="people-distance-note">One parent, child, or partner connection is one family link. Siblings and grandparents are usually 2 links away; first cousins are usually 4. Distances use the saved tree.</p>
     <p class="people-filter-error" id="people-filter-error" role="alert" hidden></p>
     <div class="people-filter-summary">
       <p id="people-filter-count" role="status"></p>
@@ -99,7 +111,7 @@ function personCard(n) {
   const t = document.createElement('template');
   t.innerHTML = `<article class="person" data-name="${esc(n)}">${avatar}
     <a class="nm" href="#/people/${encodeURIComponent(n)}" data-open="${esc(n)}">${esc(n)}</a>
-    <div class="meta person-sources"><b>${c.total.toLocaleString()}</b> ${c.total === 1 ? 'photo' : 'photos'}${c.total ? `<br>${c.album.toLocaleString()} in albums · ${c.familysearch.toLocaleString()} from FamilySearch` : ''}</div>
+    <div class="meta person-sources"><b>${c.total.toLocaleString()}</b> ${c.total === 1 ? 'photo' : 'photos'}${c.total && c.familysearch ? `<br>${c.album.toLocaleString()} in albums · ${c.familysearch.toLocaleString()} from FamilySearch` : ''}</div>
     <div class="person-distance"></div><button class="btn link" data-rename="${esc(n)}" aria-label="Rename ${esc(n)}">Rename</button></article>`;
   return t.content.firstElementChild;
 }

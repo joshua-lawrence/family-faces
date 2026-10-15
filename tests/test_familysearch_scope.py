@@ -136,3 +136,10 @@ class MatchingScopeTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class UnconfiguredBranchTest(unittest.TestCase):
+    def test_branch_without_a_root_matches_everyone(self):
+        scope = build_scope([{'path': 'fs.jpg', 'source': 'FamilySearch'}], {}, {}, {'branch': 'maternal'})
+        self.assertIsNone(scope.names)
+        self.assertTrue(scope.allows_name('Anyone'))

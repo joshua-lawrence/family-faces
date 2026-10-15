@@ -322,7 +322,7 @@
   if (btn) nav.prepend(btn);
   // The main state takes a moment; draw Home from its own fast endpoint right away.
   if (tab === "home" && !S) {
-    document.title = "Home · Family Photo Explorer";
+    document.title = "Home · Family Faces";
     draw();
     refresh();
   }

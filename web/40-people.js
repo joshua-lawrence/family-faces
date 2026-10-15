@@ -180,7 +180,7 @@ async function ppMarkDifferent(a, b, undo = false) {
 
 // ---------- #/people/_duplicates ----------
 function renderDuplicatesPage() {
-  document.title = 'Possible duplicates · People · Family Photo Explorer';
+  document.title = 'Possible duplicates · People · Family Faces';
   const d = ppDupes();
   if (!d && !PP.dupes.error) ppLoadDupes().then(() => { if (tab === 'people' && person === '_duplicates') ppFillDupes(); });
   if (d) queueMicrotask(ppRestoreFocus);
@@ -259,7 +259,7 @@ function renderPersonPage() {
   if (person === '_duplicates') return renderDuplicatesPage();
   const ignored = person === '_ignore';
   const title = ignored ? 'Ignored faces' : person;
-  if (ignored) document.title = 'Ignored faces · People · Family Photo Explorer';
+  if (ignored) document.title = 'Ignored faces · People · Family Faces';
   const back = `<button class="btn" id="back">← All people</button>`;
   if (!P) return `<div class="detail-head">${back}<h2>${esc(title)}</h2></div><div class="empty">No faces have this name any more.</div>`;
   if (!ignored && P.alias_of && !P.faces.length && !P.photos) {   // an old name or bookmark: say who it means

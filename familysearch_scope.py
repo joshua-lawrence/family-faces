@@ -58,6 +58,9 @@ def build_scope(photos, identities, doc, config=None):
     source_paths = frozenset(p['path'] for p in photos if p.get('source') == 'FamilySearch')
     if not config or config.get('branch') == 'all':
         return MatchingScope(None, source_paths, source_paths)
+    if config.get('branch') in {'maternal', 'paternal'} and not config.get('root_id'):
+        # No family branch has been set up (a new library): match against everyone.
+        return MatchingScope(None, source_paths, source_paths)
     if config.get('branch') == 'none':
         return MatchingScope(frozenset(), source_paths, frozenset(), branch='none')
     if config.get('branch') not in BRANCHES:
