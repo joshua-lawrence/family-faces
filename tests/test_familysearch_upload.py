@@ -5,7 +5,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from familysearch_upload import Uploads, face_rectangle
+from family_faces.familysearch.upload import Uploads, face_rectangle
 
 
 class UploadTests(unittest.TestCase):

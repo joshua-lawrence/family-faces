@@ -17,7 +17,7 @@ const context = vm.createContext({window:{},document:{getElementById:()=>root,ad
   AbortController,URLSearchParams,tab:'people',
   fetch:(url,options)=>{calls.push({url,signal:options.signal});return new Promise(resolve=>pending.push(resolve));}
 });
-let source = await readFile(process.argv[2] || new URL('../web/43-face-similarity.js',import.meta.url),'utf8');
+let source = await readFile(process.argv[2] || new URL('../family_faces/web/43-face-similarity.js',import.meta.url),'utf8');
 source = source.replace('window.faceSimilaritySection = section;',
   'window.test = {load,normalize,params,settings,setRoot:el=>root=el,setName:name=>selectedName=name}; window.faceSimilaritySection = section;');
 vm.runInContext(source,context);

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-const html = fs.readFileSync(new URL('../review.html', import.meta.url), 'utf8');
+const html = fs.readFileSync(new URL('../family_faces/web/review.html', import.meta.url), 'utf8');
 const start = html.indexOf('function familySearchFace(');
 const end = html.indexOf('function header()', start);
 assert.ok(start >= 0 && end > start);

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {test} from 'node:test';
-const source=fs.readFileSync(new URL('../web/41-tree-view.js',import.meta.url),'utf8');
+const source=fs.readFileSync(new URL('../family_faces/web/41-tree-view.js',import.meta.url),'utf8');
 const doc={people:Object.fromEntries(['Root','Parent','Grandparent','Child','Grandchild','Partner','Distant'].map(n=>[n,{}])),
   parents:[['Parent','Root'],['Grandparent','Parent'],['Root','Child'],['Child','Grandchild']],partners:[['Root','Partner']]};
 function context(){const c=vm.createContext({T:structuredClone(doc),tSel:'Root',tab:'tree',homePerson:()=>'Root',TREE_LAST_KEY:'last',S:{},
@@ -12,7 +12,7 @@ function context(){const c=vm.createContext({T:structuredClone(doc),tSel:'Root',
 test('initial tree shows only parents, children and partner',()=>{const c=context();assert.deepEqual([...c.treeVisibleNames()],['Root','Parent','Child','Partner']);});
 test('expansion adds one generation and focus resets the visible branch',()=>{const c=context();c.treeVisibleNames();c.treeExpand('Parent','parents');assert.ok(c.treeVisibleNames().includes('Grandparent'));assert.ok(!c.treeVisibleNames().includes('Distant'));c.treeFocusOn('Child');assert.deepEqual([...c.treeVisibleNames()],['Root','Child','Grandchild']);assert.ok(c.T.people.Distant);});
 test('all people and deleted branch root remain usable',()=>{const c=context();c.treeVisibleNames();vm.runInContext('tAllPeople=true',c);assert.equal(c.treeVisibleNames().length,7);delete c.T.people.Root;c.tSel='Child';assert.deepEqual([...c.treeVisibleNames()],['Child','Grandchild']);});
-test('layout contains only visible people with finite positions',()=>{const c=context();c.TW=128;c.TH=250;c.TGAP=26;c.UGAP=56;c.VGAP=96;const html=fs.readFileSync(new URL('../review.html',import.meta.url),'utf8');vm.runInContext(html.slice(html.indexOf('function layoutTree('),html.indexOf('function drawTree(')),c);const names=c.treeVisibleNames();const layout=c.layoutTree(names);assert.deepEqual(Object.keys(layout).sort(),[...names].sort());assert.ok(Object.values(layout).every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)));});
+test('layout contains only visible people with finite positions',()=>{const c=context();c.TW=128;c.TH=250;c.TGAP=26;c.UGAP=56;c.VGAP=96;const html=fs.readFileSync(new URL('../family_faces/web/review.html',import.meta.url),'utf8');vm.runInContext(html.slice(html.indexOf('function layoutTree('),html.indexOf('function drawTree(')),c);const names=c.treeVisibleNames();const layout=c.layoutTree(names);assert.deepEqual(Object.keys(layout).sort(),[...names].sort());assert.ok(Object.values(layout).every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)));});
 
 test('expansion fits the new branch and restores card focus',()=>{
   const c=context(), calls=[];

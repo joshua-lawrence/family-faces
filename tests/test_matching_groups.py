@@ -9,8 +9,8 @@ from unittest.mock import patch
 import numpy as np
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-import matching_groups
-from familysearch_scope import MatchingScope
+from family_faces.pipeline import matching_groups
+from family_faces.familysearch.scope import MatchingScope
 
 
 class MatchingGroupsTest(unittest.TestCase):

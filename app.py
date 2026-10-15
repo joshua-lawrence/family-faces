@@ -16,9 +16,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 
 
-def run(script, *args):
-    sys.argv = [str(HERE / script), *args]
-    runpy.run_path(str(HERE / script), run_name="__main__")
+def run(module, *args):
+    sys.argv = [module, *args]
+    runpy.run_module(f"family_faces.{module}", run_name="__main__", alter_sys=True)
 
 
 def main():
@@ -29,7 +29,7 @@ def main():
     parser.add_argument("--no-scan", action="store_true", help="open the app without looking for new faces first")
     args = parser.parse_args()
 
-    import config
+    from family_faces import config
     if args.library or args.data:
         changes = {}
         if args.library:
@@ -56,10 +56,10 @@ def main():
     print(f"Library: {config.LIBRARY}\nApp data: {config.DATA}")
     if not args.no_scan and not (config.DATA / "clusters.json").exists():
         print("Looking for faces in your photos. This runs once; later photos go through the Inbox.")
-        run("embed.py")
-        run("cluster.py")
-        run("map.py")
-    run("serve.py")
+        run("pipeline.embed")
+        run("pipeline.cluster")
+        run("pipeline.map")
+    run("serve")
 
 
 if __name__ == "__main__":

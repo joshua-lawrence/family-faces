@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 
-const source = await readFile(process.argv[2] || new URL('../web/30-viewer.js', import.meta.url), 'utf8');
+const source = await readFile(process.argv[2] || new URL('../family_faces/web/30-viewer.js', import.meta.url), 'utf8');
 const start = source.indexOf('  async function nobodyElse()');
 const end = source.indexOf('  // ---------- caption and date ----------', start);
 assert.ok(start >= 0 && end > start);

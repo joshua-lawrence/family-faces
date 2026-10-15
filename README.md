@@ -64,11 +64,11 @@ Photos, Lightroom or Picasa are read the same way.
 
 ## Better matching (optional)
 
-`uv run python reembed.py` adds [AdaFace](https://github.com/mk-minchul/AdaFace) fingerprints
+`uv run python -m family_faces.pipeline.reembed` adds [AdaFace](https://github.com/mk-minchul/AdaFace) fingerprints
 alongside ArcFace. Download the IR-101 WebFace12M weights as
-`~/.insightface/models/adaface_ir101_webface12m.safetensors` first. Then re-run `cluster.py`.
+`~/.insightface/models/adaface_ir101_webface12m.safetensors` first. Then regroup with `uv run python -m family_faces.pipeline.cluster`.
 
-On the author's library of about 18,000 photos, `bakeoff.py` measured how often a face's nearest
+On the author's library of about 18,000 photos, `family_faces/pipeline/bakeoff.py` measured how often a face's nearest
 named face is the right person. The albums were split into five blocks and faces were only matched
 against other blocks, so a face can't be recognised from the same outfit on the next page.
 
@@ -81,11 +81,11 @@ against other blocks, so a face can't be recognised from the same outfit on the 
 
 | Command | What it does |
 | --- | --- |
-| `uv run python cluster.py [threshold]` | Regroup faces (default 0.65; lower is stricter). Names are kept. |
-| `uv run python export.py` | Copy each person's photos to `<library>/_by_person/<Name>/` as hard links, plus a CSV. |
-| `uv run python map.py` | Lay out every face on a map of look-alikes for the Map tab. |
-| `uv run python attrs.py` then `age.py` | Aligned portraits and age estimates for the Portraits tab. |
-| `uv run python orient.py` then `rotate.py --apply` | Find and fix sideways photos losslessly, keeping the originals. |
+| `uv run python -m family_faces.pipeline.cluster [threshold]` | Regroup faces (default 0.65; lower is stricter). Names are kept. |
+| `uv run python -m family_faces.export` | Copy each person's photos to `<library>/_by_person/<Name>/` as hard links, plus a CSV. |
+| `uv run python -m family_faces.pipeline.map` | Lay out every face on a map of look-alikes for the Map tab. |
+| `uv run python -m family_faces.pipeline.attrs` then `-m family_faces.pipeline.age` | Aligned portraits and age estimates for the Portraits tab. |
+| `uv run python -m family_faces.pipeline.orient` then `-m family_faces.pipeline.rotate --apply` | Find and fix sideways photos losslessly, keeping the originals. |
 
 ## Settings
 
@@ -116,6 +116,24 @@ The code is MIT licensed. The face models are not part of this repository and ha
 InsightFace's pretrained models (buffalo_l) are released for non-commercial research use, and
 AdaFace weights follow their own license. Check those terms before using this in anything
 commercial.
+
+## Project layout
+
+```
+app.py                  Start here: picks the library, finds faces the first time, opens the app
+family_faces/
+  config.py             Where the library and the app's data live; optional integrations
+  library.py            The photo library: scanning, captions, the Inbox
+  people.py, tree.py    Who is who, and how they are related
+  serve.py              The local web server (http://localhost:8765)
+  api/                  One module per group of endpoints, loaded by serve.py
+  pipeline/             Finding faces: detection, fingerprints, ages, grouping, the face map, Inbox imports
+  familysearch/         Optional FamilySearch tags, tree hints and uploads
+  web/                  The interface: review.html plus the scripts and styles it loads
+  export.py, portraits.py, morph.py, photo_gallery.py, people_filters.py, family.py
+tests/                  Python unittest and Node tests
+docs/DESIGN.md          Design notes for the interface
+```
 
 ## Development
 

@@ -42,7 +42,7 @@ const context = vm.createContext({
     return { ok: true, json: async () => data };
   },
 });
-vm.runInContext(await readFile(process.argv[2] || new URL('../web/53-familysearch-tags.js', import.meta.url), 'utf8'), context);
+vm.runInContext(await readFile(process.argv[2] || new URL('../family_faces/web/53-familysearch-tags.js', import.meta.url), 'utf8'), context);
 context.window.FamilySearchTags.mount(host, 'photo.png');
 const click = key => listeners.get('click')({ target: nodes.get(`[data-fst-${key}]`) });
 await click('reload');

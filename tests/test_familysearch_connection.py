@@ -5,7 +5,7 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
-import api_familysearch_connection as connection
+from family_faces.api import familysearch_connection as connection
 
 
 class ConnectionTests(unittest.TestCase):

@@ -3,7 +3,7 @@ import unittest
 
 import numpy as np
 
-from api_face_similarity import compare, options
+from family_faces.api.face_similarity import compare, options
 
 
 class Scope:

@@ -1,5 +1,5 @@
 import unittest
-from familysearch_cleanup import hide_unlinked, hidden_names
+from family_faces.familysearch.cleanup import hide_unlinked, hidden_names
 
 
 class CleanupTests(unittest.TestCase):

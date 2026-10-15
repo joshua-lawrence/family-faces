@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import {test} from 'node:test';
 
-const html = fs.readFileSync(new URL('../review.html', import.meta.url), 'utf8');
+const html = fs.readFileSync(new URL('../family_faces/web/review.html', import.meta.url), 'utf8');
 const source = html.slice(html.indexOf('let TVERSION ='), html.indexOf('async function saveTree()'));
 assert.ok(source.includes('async function renderTree('));
 

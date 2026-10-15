@@ -6,8 +6,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from PIL import Image
-from familysearch_memory_tags import MemoryTags, memory_target
-import api_familysearch_memory_tags as api
+from family_faces.familysearch.memory_tags import MemoryTags, memory_target
+from family_faces.api import familysearch_memory_tags as api
 
 
 class MemoryTagTests(unittest.TestCase):

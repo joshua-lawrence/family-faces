@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {test} from 'node:test';
-const source=fs.readFileSync(new URL('../web/42-people-matches.js',import.meta.url),'utf8');
+const source=fs.readFileSync(new URL('../family_faces/web/42-people-matches.js',import.meta.url),'utf8');
 function setup(fetchPage) {
   const listeners={}, c=vm.createContext({URLSearchParams,person:'Person',tab:'people',reviewSettings:{branch:'maternal'},
     localStorage:{getItem:()=>null},document:{addEventListener:(type,listener)=>listeners[type]=listener},

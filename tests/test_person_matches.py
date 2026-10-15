@@ -3,7 +3,7 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import Mock
 import numpy as np
-from api_person_matches import PersonMatches, rank_matches
+from family_faces.api.person_matches import PersonMatches, rank_matches
 
 
 class MatchesTest(unittest.TestCase):

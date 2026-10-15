@@ -6,8 +6,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import serve
-from familysearch_scope import build_scope
+from family_faces import serve
+from family_faces.familysearch.scope import build_scope
 
 
 class ReviewStateTest(unittest.TestCase):

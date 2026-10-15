@@ -4,7 +4,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from photo_gallery import gallery, thumbnail
+from family_faces.photo_gallery import gallery, thumbnail
 
 PHOTOS = [{'path': 'both.jpg'}, {'path': 'mother.jpg'}, {'path': 'father.jpg'}, {'path': 'unknown.jpg'},
           {'path': 'source.jpg', 'source': 'FamilySearch'}]

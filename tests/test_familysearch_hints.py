@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from familysearch_hints import photo_name_hints, group_source_hints
+from family_faces.familysearch.hints import photo_name_hints, group_source_hints
 
 
 class SourceHintsTest(unittest.TestCase):

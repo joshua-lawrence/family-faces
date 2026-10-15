@@ -9,11 +9,11 @@ from unittest.mock import patch
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from familysearch_scope import build_scope
-from familysearch_hints import photo_name_hints
-import serve
+from family_faces.familysearch.scope import build_scope
+from family_faces.familysearch.hints import photo_name_hints
+from family_faces import serve
 with patch.object(sys, 'argv', ['cluster.py']):
-    cluster = importlib.import_module('cluster')
+    cluster = importlib.import_module('family_faces.pipeline.cluster')
 
 
 CONFIG = {'branch': 'maternal', 'root_id': 'ROOT-001', 'parent_id': 'MOMM-001'}

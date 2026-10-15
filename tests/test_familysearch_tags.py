@@ -1,6 +1,6 @@
 import unittest
 
-from familysearch_tags import map_memories, unique_people_by_id
+from family_faces.familysearch.tags import map_memories, unique_people_by_id
 
 
 class TagMappingTests(unittest.TestCase):

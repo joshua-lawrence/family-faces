@@ -1,6 +1,6 @@
 import unittest
 
-from people_filters import default_root, photo_counts, relations
+from family_faces.people_filters import default_root, photo_counts, relations
 
 
 class PeopleFilterTests(unittest.TestCase):
