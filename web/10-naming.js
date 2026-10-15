@@ -274,9 +274,25 @@ function field(kind, id, value, placeholder, label) {
     <div class="nm-status" id="${sid}" aria-live="polite"></div></div>`;
 }
 
-function pickChips(suggest, noun) {
-  return (suggest || []).map(([n, s], i) => `<button type="button" class="chip sugg" data-nm="pick" data-name="${esc(n)}"
-    aria-keyshortcuts="${i + 1}" aria-label="${esc(n)}, ${Math.round(s * 100)}% match (press ${i + 1})" title="Name this ${noun} ${esc(n)} (key ${i + 1})"><kbd class="nm-key" aria-hidden="true">${i + 1}</kbd>${esc(n)}<small aria-hidden="true">${Math.round(s * 100)}%</small></button>`).join('');
+function pickChips(suggest, noun, from = 0) {
+  return (suggest || []).map(([n, s], j) => { const i = j + from; return `<button type="button" class="chip sugg" data-nm="pick" data-name="${esc(n)}"
+    aria-keyshortcuts="${i + 1}" aria-label="${esc(n)}, ${Math.round(s * 100)}% match (press ${i + 1})" title="Name this ${noun} ${esc(n)} (key ${i + 1})"><kbd class="nm-key" aria-hidden="true">${i + 1}</kbd>${esc(n)}<small aria-hidden="true">${Math.round(s * 100)}%</small></button>`; }).join('');
+}
+// The first suggestion, large: who the app thinks this is, with the key that names them.
+function bestRow([n, s], noun) {
+  return `<button type="button" class="nm-best" data-nm="pick" data-name="${esc(n)}" aria-keyshortcuts="1"
+    aria-label="${esc(n)}, best match, ${Math.round(s * 100)}% (press 1)" title="Name this ${noun} ${esc(n)} (key 1)">
+    ${avatar(n)}<span class="nm-best-text"><span class="nm-best-label">Best match</span><b>${esc(n)}</b></span>
+    <span class="nm-best-pct">${Math.round(s * 100)}%</span><kbd class="nm-key" aria-hidden="true">1</kbd></button>`;
+}
+// The photos a group's faces come from, as small whole-photo thumbnails.
+function photoStrip(c, max = 8) {
+  const paths = [...new Set(c.faces.map(f => S.face_photo?.[f]).filter(Boolean))];
+  if (paths.length < 1) return '';
+  return `<div class="nm-strip"><span class="nm-label">From ${paths.length === 1 ? 'this photo' : `these ${paths.length.toLocaleString()} photos`}</span>
+    <div class="nm-strip-row">${paths.slice(0, max).map(p => `<button type="button" class="nm-strip-photo" data-source-photo="${esc(p)}" aria-label="Open ${esc(p.split('/').pop())}" title="${esc(p)}">
+      <img loading="lazy" decoding="async" src="/photos/${encodeURIComponent(p)}?v=${S.v}&thumbnail=1" alt=""></button>`).join('')}
+      ${paths.length > max ? `<span class="nm-strip-more meta">+${(paths.length - max).toLocaleString()}</span>` : ''}</div></div>`;
 }
 // The suggestions on the card you're on and the next two don't change for a moment after you act, so the
 // chip you just read is the one a number key picks. They catch up once you pause (about a second).
@@ -311,24 +327,36 @@ function groupCard(c) {
   const chipsNow = steadyChips(`group:${c.id}`, c.suggest);
   const best = bestMatch({ suggest: chipsNow });
   const draft = reviewDrafts.get(reviewDraftKey('group', c.id)) ?? c.name ?? '';
-  const sugg = pickChips(chipsNow, 'group');
+  const top1 = chipsNow?.[0];
+  const sugg = pickChips((chipsNow || []).slice(1), 'group', 1);
   const caps = captionWords(c).map(([w, k]) => `<button type="button" class="chip nm-cap" data-nm="fill" data-nm-open="1" data-name="${esc(w)}"
     title="“${esc(w)}” is in ${k} of this group’s ${c.captioned} captioned photos. Shows known people called ${esc(w)}.">${esc(w)}<small>${k}</small></button>`).join('');
   const fs = fsChips(c.unlabeled ? c.source_hints : [], 3, true);
-  return `<section class="card nm-card" id="cl-${c.id}" data-nm-card="group:${c.id}" tabindex="-1" role="group" aria-label="Unnamed group, ${counts}">
-    <div class="nm-head">
-      ${field('group', c.id, draft, 'Who is this?', `Name for this group of ${c.faces.length} faces`)}
-      <div class="nm-acts">
-        <button type="button" class="btn primary" data-nm="save">Save</button>
-        <button type="button" class="btn" data-nm="skip" aria-keyshortcuts="S" title="Skip for now (S). The group moves to the end of the list.">Skip</button>
-        <button type="button" class="btn danger" data-nm="ignore" aria-keyshortcuts="I" title="Not someone to tag: strangers, paintings, statues (I)">Ignore</button>
-        ${c.name ? `<button type="button" class="btn" data-unname="${c.id}" title="Some faces here are already named ${esc(c.name)}. This clears every name in the group.">Clear name</button>` : ''}
-      </div>
-      <span class="meta nm-count">${counts}${best ? ` · <span class="match-score">Best match <b>${Math.round(best * 100)}%</b></span>` : ''}</span>
+  return `<section class="card nm-card nm-group" id="cl-${c.id}" data-nm-card="group:${c.id}" tabindex="-1" role="group" aria-label="Unnamed group, ${counts}">
+    <div class="nm-faces">
+      <div class="nm-faces-head"><span class="meta nm-count">${counts}${best ? ` · <span class="match-score">Best match <b>${Math.round(best * 100)}%</b></span>` : ''}</span>
+        <span class="meta nm-faces-tip">Click faces that don’t belong to select them</span></div>
+      ${grid}
+      ${photoStrip(c)}
     </div>
-    ${sugg ? `<div class="nm-row"><span class="nm-label">Looks like</span>${sugg}</div>` : ''}
-    ${caps || fs ? `<div class="nm-row">${caps ? `<span class="nm-label">In captions</span>${caps}` : ''}${caps && fs ? '<span class="nm-sep" aria-hidden="true"></span>' : ''}${fs ? `<span class="nm-label">FamilySearch links</span>${fs}` : ''}</div>` : ''}
-    ${grid}
+    <div class="nm-panel">
+      <h3 class="nm-ask">Who is this?</h3>
+      ${top1 ? bestRow(top1, 'group') : ''}
+      <div class="nm-head">
+        ${field('group', c.id, draft, top1 ? 'Or type a name' : 'Type a name', `Name for this group of ${c.faces.length} faces`)}
+        <div class="nm-acts">
+          <button type="button" class="btn primary" data-nm="save">Save</button>
+          ${c.name ? `<button type="button" class="btn" data-unname="${c.id}" title="Some faces here are already named ${esc(c.name)}. This clears every name in the group.">Clear name</button>` : ''}
+        </div>
+      </div>
+      ${sugg ? `<div class="nm-row"><span class="nm-label">Also looks like</span>${sugg}</div>` : ''}
+      ${caps ? `<div class="nm-row"><span class="nm-label">In captions</span>${caps}</div>` : ''}
+      ${fs ? `<div class="nm-row"><span class="nm-label">FamilySearch links</span>${fs}</div>` : ''}
+      <div class="nm-panel-foot">
+        <button type="button" class="btn" data-nm="skip" aria-keyshortcuts="S" title="Skip for now (S). The group moves to the end of the list.">Skip</button>
+        <button type="button" class="btn quiet" data-nm="ignore" aria-keyshortcuts="I" title="Not someone to tag: strangers, paintings, statues (I)">Not someone to tag</button>
+      </div>
+    </div>
   </section>`;
 }
 
@@ -377,14 +405,21 @@ function renderGroups() {
        <button type="button" class="btn nm-icon" data-group-page="1" aria-label="Next groups" ${start + GROUP_PAGE_SIZE >= eligible.length ? 'disabled' : ''}>${svg('right')}</button>`
     : `<span class="meta"><b>${eligible.length.toLocaleString()}</b> ${eligible.length === 1 ? 'group' : 'groups'}</span>`;
   const regroup = `<button type="button" class="btn" data-regroup title="Group the unnamed faces again from scratch. Names aren't changed.">${regrouping ? 'Regrouping…' : 'Regroup'}</button>`;
-  const top = topHTML('groups', busy ? '' : `<div class="nm-pager">${regroup}${range}</div>`);
+  const one = oneAtATime();
+  NM.groupStart = start; NM.groupTotal = eligible.length;
+  const view = `<span class="seg nm-view" role="group" aria-label="Show groups"><button type="button" data-nm="view" data-view="one" aria-pressed="${one}" class="${one ? 'on' : ''}">One at a time</button><button type="button" data-nm="view" data-view="list" aria-pressed="${!one}" class="${one ? '' : 'on'}">List</button></span>`;
+  const top = topHTML('groups', busy ? '' : `<div class="nm-pager">${view}${regroup}${one ? '' : range}</div>`);
   if (busy) return top + busy;
   if (!list.length) return top + `<div class="empty">${eligible.length || !reviewGroups().length ? 'No groups match these filters. Change a filter or use Reset filters in Sort and filters.' : 'Every group on this list has a name.'}</div>`;
   const foot = eligible.length > GROUP_PAGE_SIZE ? `<div class="nm-foot">
       <button class="btn" data-group-page="-1" ${groupPage === 0 ? 'disabled' : ''}>Previous groups</button>
       <span class="meta">Groups ${(start + 1).toLocaleString()}–${Math.min(start + GROUP_PAGE_SIZE, eligible.length).toLocaleString()} of ${eligible.length.toLocaleString()}</span>
       <button class="btn" data-group-page="1" ${start + GROUP_PAGE_SIZE >= eligible.length ? 'disabled' : ''}>Next groups</button></div>` : '';
-  return top + `<div class="nm-cards">${list.map(groupCard).join('')}</div>` + foot;
+  const step = one ? `<div class="nm-step"><span class="nm-step-text" id="nm-progress" aria-live="polite"></span>
+      <span class="nm-step-bar" aria-hidden="true"><i id="nm-progress-bar"></i></span>
+      <button type="button" class="btn nm-icon" data-nm="step" data-dir="-1" aria-label="Previous group" title="Previous group (↑)">${svg('left')}</button>
+      <button type="button" class="btn nm-icon" data-nm="step" data-dir="1" aria-label="Next group" title="Next group (↓)">${svg('right')}</button></div>` : '';
+  return top + step + `<div class="nm-cards${one ? ' nm-one' : ''}">${list.map(groupCard).join('')}</div>` + foot;
 }
 
 function renderLeftovers() {
@@ -491,6 +526,21 @@ function markCurrent() {
     const input = card.querySelector('input.name');
     if (input && !input.value) updateStatus(input);
   }
+  progress();
+}
+// Groups, one at a time: "Group 3 of 38". Groups you've just named leave the count at once.
+const oneAtATime = () => store.get('groups-view') !== 'list' && !showNamed;
+function progress() {
+  const el = $('#nm-progress');
+  if (!el) return;
+  const cards = [...document.querySelectorAll('#main .nm-cards > .nm-card')];
+  const gone = cards.filter(c => c.classList.contains('nm-leaving')).length;
+  const live = cards.filter(c => !c.classList.contains('nm-leaving'));
+  const i = live.indexOf(cardEl(NM.cur)), total = Math.max(0, (NM.groupTotal || 0) - gone);
+  el.innerHTML = i < 0 ? (total ? `${total.toLocaleString()} groups left` : 'Every group on this page is done')
+    : `Group <b>${(NM.groupStart + i + 1).toLocaleString()}</b> of ${total.toLocaleString()}`;
+  const bar = $('#nm-progress-bar');
+  if (bar) bar.style.width = `${total ? Math.round(100 * (NM.groupStart + Math.max(i, 0) + 1) / total) : 100}%`;
 }
 function focusCard(card, mode = 'input', { scroll = false } = {}) {
   if (!card) return;
@@ -1176,6 +1226,11 @@ document.addEventListener('click', e => {
       return fill(input, t.dataset.name, { open: t.dataset.nmOpen === '1' });
     }
     case 'accept': return acceptStrong(t);
+    case 'step': { const c = cardEl(NM.cur) || liveCards()[0]; return c && move(c, +t.dataset.dir, 'input'); }
+    case 'view': {
+      if (t.dataset.view === 'one' && showNamed) return toast('Turn off “Show named groups” in Sort and filters to go one group at a time.');
+      store.set('groups-view', t.dataset.view); NM.focusKey = NM.cur; return render();
+    }
     case 'tip': {
       store.set(`naming-tip-${t.dataset.tip}`, 'dismissed');
       const tip = t.closest('.nm-tip');

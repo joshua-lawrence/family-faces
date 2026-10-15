@@ -10,6 +10,7 @@ const PP = {
   checks: {key: null, name: null, data: null}, checksFetch: null,
   facesFor: null, facesShown: 200, conflictsAll: false, lowAll: false, busy: false,
   ok: null, okLoading: null,      // "Both correct" photos: Map photo -> [Set of face ids]
+  tab: 'photos', photoData: null, tree: null,   // the person page's open tab, timeline photos and family tree
   focusPair: null,                // after a re-render on Possible duplicates: {index} or {key} of the card to focus
 };
 const PP_FACES_PAGE = 200, PP_CONFLICTS_FIRST = 6, PP_LOW_FIRST = 36;
@@ -274,10 +275,8 @@ function renderPersonPage() {
   const conf = ignored ? new Set() : ppConflictSet();   // two ignored faces in one photo are fine
   const nConf = conf.size, nFine = ignored ? 0 : ppMarkedFine();
   const low = ignored ? [] : P.faces.filter(f => !conf.has(f.id) && f.fit < 0.4).sort((a, b) => a.fit - b.fit);
-  const head = `<div class="detail-head">${back}<h2>${esc(title)}</h2>
-      <span class="meta"><b>${P.faces.length.toLocaleString()}</b> ${P.faces.length === 1 ? 'face' : 'faces'} · <b>${(P.photos || 0).toLocaleString()}</b> ${P.photos === 1 ? 'photo' : 'photos'}</span>
-      ${ignored || !hasData ? '' : `<button class="btn" data-rename="${esc(person)}">Rename</button>${P.faces.length ? `<button class="btn" data-fs-upload-person="${esc(person)}">Upload to FamilySearch</button>` : ''}`}
-    </div>${ignored ? '' : personContext(P.identity || {})}`;
+  const head = ignored ? `<div class="detail-head">${back}<h2>${esc(title)}</h2>
+      <span class="meta"><b>${P.faces.length.toLocaleString()}</b> ${P.faces.length === 1 ? 'face' : 'faces'}</span></div>` : ppHeroHTML(hasData);
 
   // 1. Check these: two faces with this name in one photo, then faces that look least like the rest.
   let checks = '';
@@ -320,7 +319,143 @@ function renderPersonPage() {
         <button data-source-photo="${esc(p.path)}" aria-label="Open ${esc(p.caption || 'FamilySearch photo')}"><img loading="lazy" src="${photoURL(p.path)}" alt="${esc(p.caption || '')}"></button>
         <div class="nm">${esc(p.caption || 'Untitled photo')}</div>
         <a class="meta" href="${esc(p.source_url)}" target="_blank" rel="noopener noreferrer">View in FamilySearch ↗</a></div>`).join('')}</div></section>` : '';
-  return head + (ignored || !window.faceSimilaritySection ? '' : window.faceSimilaritySection(person)) + (ignored || typeof personMatchesSection !== 'function' ? '' : personMatchesSection()) + checks + faces + fs;
+  if (ignored) return head + checks + faces;
+  // A person: their photos by decade first; naming checks, look-alikes and records one tab away.
+  const records = personContext(P.identity || {}) + fs;
+  const nChecks = nConf + low.length;
+  const tabs = [['photos', 'Photos', ''], ['faces', 'Faces', nChecks ? `<span class="pp-tab-badge" title="${ppPlural(nChecks, 'face')} to check">${nChecks}</span>` : `<span class="pp-tab-count">${P.faces.length.toLocaleString()}</span>`],
+    ['more', 'Find more', ''], ...(records ? [['records', 'Records', '']] : [])];
+  if (!tabs.some(([id]) => id === PP.tab)) PP.tab = 'photos';
+  const panel = (id, html) => `<div class="pp-panel" id="pp-panel-${id}" role="tabpanel" aria-labelledby="pp-tab-${id}" ${PP.tab === id ? '' : 'hidden'}>${html}</div>`;
+  const more = (window.faceSimilaritySection ? window.faceSimilaritySection(person) : '') + (typeof personMatchesSection === 'function' ? personMatchesSection() : '');
+  queueMicrotask(ppFillPerson);
+  return head + `<div class="pp-layout"><div class="pp-body">
+      <div class="pp-tabs" role="tablist" aria-label="${esc(person)}">${tabs.map(([id, label, extra]) => `<button type="button" role="tab" id="pp-tab-${id}" data-pp-tab="${id}" aria-controls="pp-panel-${id}" aria-selected="${PP.tab === id}" tabindex="${PP.tab === id ? 0 : -1}">${label}${extra}</button>`).join('')}</div>
+      ${panel('photos', `<div id="pp-decades" class="pp-decades" aria-live="polite"><p class="help" role="status">Loading photos…</p></div>`)}
+      ${panel('faces', checks + faces)}
+      ${panel('more', more || '<p class="help">Nothing to look for yet.</p>')}
+      ${records ? panel('records', records) : ''}
+    </div>
+    <aside class="pp-family" id="pp-family" aria-labelledby="pp-family-title"><h3 id="pp-family-title">Close family</h3><div id="pp-family-list"><p class="help" role="status">Loading…</p></div></aside>
+  </div>`;
+}
+
+// ---------- person page: header, photos by decade, close family ----------
+
+const ppYear = d => (String(d || '').match(/\b(1[5-9]\d\d|20\d\d)\b/) || [])[1] || '';
+function ppHeroHTML(hasData) {
+  const fsp = P.identity?.familysearch || {};
+  const born = ppYear(fsp.birth?.date), died = ppYear(fsp.death?.date);
+  const years = born || died ? `${born || '?'}–${died}` : '';
+  const rep = [...P.faces].sort((a, b) => b.fit - a.fit)[0];
+  const avatar = rep ? `<img class="pp-avatar" src="/thumbs/${rep.id}.jpg?v=${S.v}" alt="">` : `<span class="pp-avatar pp-avatar-empty" aria-hidden="true">${esc(person.trim()[0] || '?')}</span>`;
+  const facts = [years ? `<span id="pp-years">${esc(years)}</span>` : '<span id="pp-years" hidden></span>',
+    `<span>${ppPlural(P.photos || 0, 'photo')}</span>`, `<span>${ppPlural(P.faces.length, 'face')}</span>`];
+  return `<div class="pp-hero">
+    <button class="btn link pp-back" id="back">← People</button>
+    <div class="pp-hero-row">${avatar}
+      <div class="pp-hero-text"><h2>${esc(person)}</h2><p class="meta pp-facts">${facts.join('<span aria-hidden="true">·</span>')}</p></div>
+      ${hasData ? `<div class="pp-hero-acts">
+        <button class="btn" data-rename="${esc(person)}">Edit name</button>
+        ${P.faces.length ? `<button class="btn" data-fsim-portrait="${esc(person)}" title="Their faces in order of age">Growing up</button>` : ''}
+        ${P.faces.length ? `<button class="btn" data-fs-upload-person="${esc(person)}">Upload to FamilySearch</button>` : ''}
+        <button class="btn primary" data-pp-tab="more">Find more</button></div>` : ''}
+    </div></div>`;
+}
+
+function ppShowTab(id, focus = false) {
+  if (!document.querySelector(`#pp-panel-${id}`)) return;
+  PP.tab = id;
+  for (const b of document.querySelectorAll('.pp-tabs [data-pp-tab]')) {
+    const on = b.dataset.ppTab === id;
+    b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1;
+    if (on && focus) b.focus();
+  }
+  for (const el of document.querySelectorAll('.pp-panel')) el.hidden = el.id !== `pp-panel-${id}`;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-pp-tab]');
+  if (!b || tab !== 'people' || !person) return;
+  ppShowTab(b.dataset.ppTab, !b.closest('.pp-tabs'));
+  if (!b.closest('.pp-tabs')) document.querySelector('.pp-tabs')?.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+});
+document.addEventListener('keydown', e => {
+  const b = e.target.closest?.('.pp-tabs [role="tab"]');
+  if (!b || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+  const all = [...document.querySelectorAll('.pp-tabs [role="tab"]')], i = all.indexOf(b);
+  const j = e.key === 'Home' ? 0 : e.key === 'End' ? all.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + all.length) % all.length;
+  e.preventDefault();
+  ppShowTab(all[j].dataset.ppTab, true);
+});
+
+// The person's photos come from the Timeline (api_dates.py), close family from the Family tree.
+function ppFillPerson() {
+  const name = person, v = S.v;
+  if (PP.photoData?.key !== `${name}|${v}`) {
+    PP.photoData = { key: `${name}|${v}`, data: null };
+    ppJSON(`/api/timeline?person=${encodeURIComponent(name)}`).then(d => { if (PP.photoData.key === `${name}|${v}`) PP.photoData.data = d; })
+      .catch(err => { if (PP.photoData.key === `${name}|${v}`) PP.photoData.data = { error: err.message }; })
+      .finally(() => { if (person === name) ppPaintPhotos(); });
+  } else ppPaintPhotos();
+  if (PP.tree?.v !== v) {
+    PP.tree = { v, data: null };
+    ppJSON('/api/tree').then(d => { if (PP.tree.v === v) PP.tree.data = d; }).catch(() => { if (PP.tree.v === v) PP.tree.data = { error: true }; })
+      .finally(() => { if (person === name) ppPaintFamily(); });
+  } else ppPaintFamily();
+}
+
+function ppPhotoTile(p) {
+  const label = p.label ? `${p.label}${p.age != null && p.age >= 0 ? ` · age ${p.age}` : ''}` : '';
+  return `<button type="button" class="pp-photo" data-source-photo="${esc(p.path)}" aria-label="Open ${esc(p.caption || p.path.split('/').pop())}${label ? `, ${esc(label)}` : ''}">
+    <img loading="lazy" decoding="async" src="/photos/${encodeURIComponent(p.path)}?v=${S.v}&thumbnail=1" alt="">${label ? `<span class="pp-photo-label">${esc(label)}</span>` : ''}</button>`;
+}
+function ppPaintPhotos() {
+  const box = document.querySelector('#pp-decades');
+  const d = PP.photoData?.data;
+  if (!box || !d) return;
+  if (d.error) { box.innerHTML = `<p class="help" role="alert">Couldn’t load the photos: ${esc(d.error)}</p>`; return; }
+  const q = encodeURIComponent(person);
+  const decades = d.decades.map(x => {
+    const shown = [...(x.photos || []), ...(x.around_photos || [])].slice(0, 8);
+    return `<section class="pp-decade"><div class="pp-decade-head"><h3>${x.decade}s</h3><span class="meta">${ppPlural(x.count, 'photo')}</span>
+      ${x.count > shown.length ? `<a class="pp-see-all" href="#/timeline?decade=${x.decade}&person=${q}">See all</a>` : ''}</div>
+      <div class="pp-photos">${shown.map(ppPhotoTile).join('')}</div></section>`;
+  }).join('');
+  // Undated photos: when nothing is dated, show the photos themselves so the page is never empty.
+  let undated = '';
+  if (d.undated) {
+    const paths = d.decades.length ? [] : [...new Set(P.faces.map(f => f.photo))].slice(0, 24);
+    undated = `<section class="pp-decade"><div class="pp-decade-head"><h3>${d.decades.length ? 'Not dated yet' : 'Photos'}</h3><span class="meta">${d.decades.length ? ppPlural(d.undated, 'photo') : `${ppPlural(d.undated, 'photo')}, not dated yet`}</span>
+      <a class="pp-see-all" href="#/timeline?view=undated">Add dates</a></div>
+      ${paths.length ? `<div class="pp-photos">${paths.map(path => ppPhotoTile({ path })).join('')}</div>` : ''}</section>`;
+  }
+  box.innerHTML = decades + undated || `<p class="help">No photos of ${esc(person)} yet.</p>`;
+}
+
+function ppPaintFamily() {
+  const box = document.querySelector('#pp-family-list'), aside = document.querySelector('#pp-family');
+  const d = PP.tree?.data;
+  if (!box || !d) return;
+  const t = d.tree || { people: {}, parents: [], partners: [] }, me = person;
+  const parents = t.parents.filter(([, c]) => c === me).map(([p]) => p);
+  const children = t.parents.filter(([p]) => p === me).map(([, c]) => c);
+  const partners = t.partners.filter(pair => pair.includes(me)).map(pair => pair[0] === me ? pair[1] : pair[0]);
+  const siblings = [...new Set(t.parents.filter(([p, c]) => parents.includes(p) && c !== me).map(([, c]) => c))];
+  const info = t.people[me];
+  if (info && !document.querySelector('#pp-years')?.textContent && (info.born || info.died)) {
+    const y = document.querySelector('#pp-years');
+    if (y) { y.textContent = `${ppYear(info.born) || '?'}–${ppYear(info.died)}`; y.hidden = false; }
+  }
+  const row = (n, rel) => {
+    const rep = d.reps?.[n], life = t.people[n] ? [ppYear(t.people[n].born), ppYear(t.people[n].died)] : ['', ''];
+    return `<li><a href="#/people/${encodeURIComponent(n)}" data-open="${esc(n)}">${rep != null ? `<img src="/thumbs/${rep}.jpg?v=${S.v}" alt="">` : `<span class="pp-fam-empty" aria-hidden="true">${esc(n.trim()[0] || '?')}</span>`}
+      <span><b>${esc(n)}</b><span class="meta">${rel}${life[0] || life[1] ? ` · ${life[0] || '?'}–${life[1]}` : ''}</span></span></a></li>`;
+  };
+  const rows = [...parents.map(n => row(n, 'Parent')), ...partners.map(n => row(n, 'Partner')), ...siblings.map(n => row(n, 'Sibling')), ...children.map(n => row(n, 'Child'))];
+  const inTree = Boolean(info);
+  box.innerHTML = rows.length ? `<ul class="pp-fam">${rows.join('')}</ul><a class="pp-see-all" href="#/tree/${encodeURIComponent(me)}">Open in Family tree</a>`
+    : `<p class="help">${inTree ? `No parents, partners or children for ${esc(me)} in the Family tree yet.` : `${esc(me)} isn’t in the Family tree yet.`}</p><a class="pp-see-all" href="#/tree">Open Family tree</a>`;
+  aside?.classList.toggle('pp-family-empty', !rows.length);
 }
 
 // Conflict photos come from /api/people/checks (face boxes for the whole photo). The request starts
