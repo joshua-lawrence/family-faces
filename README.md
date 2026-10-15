@@ -13,6 +13,10 @@ source so other families can do the same with their albums.
   until you click. Every change can be undone from History.
 - **Builds a family tree.** Add parents, partners and children, filter people by how closely they
   are related, and export GEDCOM for Ancestry, FamilySearch or any genealogy app.
+- **Works with FamilySearch in both directions.** It reads the face tags relatives have added to
+  FamilySearch Memories and uses those faces to find the same people in my albums, and it sends my
+  named faces back to FamilySearch as tagged photos. That loop is how strangers in my albums get
+  names.
 - **Dates undated photos.** Estimates when a photo was taken from its caption, the ages of the
   people in it against their birth years, and how colourful the print is.
 - **Shows people across their lives.** Portraits by age, "growing up" morph videos, and average
@@ -119,10 +123,26 @@ family tree opens.
 
 ### FamilySearch (optional)
 
-The app can read face tags from FamilySearch Memories and upload chosen photos and tags. It talks
-to FamilySearch through two small Node scripts that you provide, which keep your sign-in outside the
-app. Add them under `"familysearch": {"connection_script": "...", "upload_script": "..."}`. Without
-them, the FamilySearch features stay switched off.
+FamilySearch is where the rest of my family's knowledge lives, so the app connects to it in both
+directions.
+
+- **From FamilySearch into the app.** It imports face tags from FamilySearch Memories. Each tag
+  links a face box to a person's tree ID, so a relative's tag gives me a known face with a name and
+  a place in the tree, without any guessing. It can also bring in the tree around those people.
+- **From the app back to FamilySearch.** I can upload album photos as new Memories, or add tags to
+  a Memory that is already there, with the people I have named. Only the faces I pick become tags.
+
+Together these turn unknown faces into known people. A face nobody in my house recognizes can match
+a face a cousin tagged on FamilySearch years ago. The person's page has a "Find more" tab that
+searches my albums for faces like that person's, and it can be limited to my mother's or father's
+side of the tree so a match lands in the right branch. Going the other way, once I upload a photo
+with the people I do know tagged, relatives working on that branch can see it and add the ones I
+don't. Suggestions are never applied on their own: I still accept each name.
+
+It talks to FamilySearch through two small Node scripts that you provide, which keep your sign-in
+outside the app. Add them under
+`"familysearch": {"connection_script": "...", "upload_script": "..."}`. Without them, the
+FamilySearch features stay switched off.
 
 ## Model licenses
 
