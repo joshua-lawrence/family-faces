@@ -437,9 +437,10 @@ function ppPaintFamily() {
   const d = PP.tree?.data;
   if (!box || !d) return;
   const t = d.tree || { people: {}, parents: [], partners: [] }, me = person;
-  const parents = t.parents.filter(([, c]) => c === me).map(([p]) => p);
-  const children = t.parents.filter(([p]) => p === me).map(([, c]) => c);
-  const partners = t.partners.filter(pair => pair.includes(me)).map(pair => pair[0] === me ? pair[1] : pair[0]);
+  const uniq = list => [...new Set(list)];
+  const parents = uniq(t.parents.filter(([, c]) => c === me).map(([p]) => p));
+  const children = uniq(t.parents.filter(([p]) => p === me).map(([, c]) => c));
+  const partners = uniq(t.partners.filter(pair => pair.includes(me)).map(pair => pair[0] === me ? pair[1] : pair[0]));
   const siblings = [...new Set(t.parents.filter(([p, c]) => parents.includes(p) && c !== me).map(([, c]) => c))];
   const info = t.people[me];
   if (info && !document.querySelector('#pp-years')?.textContent && (info.born || info.died)) {

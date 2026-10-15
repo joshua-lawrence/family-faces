@@ -86,7 +86,7 @@
       </div>
       <dl class="home-stats">
         ${stat("Faces in album photos", f.album_named, f.album_total, "named")}
-        ${stat("Faces in FamilySearch photos", f.fs_named, f.fs_total, "named")}
+        ${f.fs_total ? stat("Faces in FamilySearch photos", f.fs_named, f.fs_total, "named") : ""}
         ${stat("Photos fully named", p.fully_named, p.with_faces, "photos with faces")}
       </dl>
     </section>`;

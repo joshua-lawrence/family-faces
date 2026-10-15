@@ -1,0 +1,11 @@
+{
+  "name": "family-faces-demo-library",
+  "private": true,
+  "type": "module",
+  "description": "Renders the made-up Hale family library used for the README screenshots.",
+  "dependencies": {
+    "@dicebear/collection": "^9.2.4",
+    "@dicebear/core": "^9.2.4",
+    "playwright": "^1.48.0"
+  }
+}

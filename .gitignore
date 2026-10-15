@@ -27,3 +27,6 @@ originals_before_rotation/
 # Local tools
 .impeccable/
 .DS_Store
+
+# Demo library tooling
+node_modules/

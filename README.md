@@ -14,6 +14,16 @@ Everything runs on your own computer: your photos and names never leave it.
 - **Shows people across their lives.** Portraits by age, "growing up" morph videos, and average
   faces by generation along the tree.
 
+![Review: one group of faces at a time, with the best match ready to accept](docs/screenshots/review.png)
+
+| | |
+| --- | --- |
+| ![Home: how much of the library is named, and what to do next](docs/screenshots/home.png) | ![A person's page: photos by decade with their age in each, and close family](docs/screenshots/person.png) |
+| ![Family tree built from the people you name](docs/screenshots/family-tree.png) | ![Timeline: photos dated from captions and the ages of the people in them](docs/screenshots/timeline.png) |
+
+<sub>Screenshots show a made-up family drawn with the CC0 [Notionists](https://www.dicebear.com/styles/notionists/) avatars.
+See [tools/demo-library](tools/demo-library) to rebuild it.</sub>
+
 ## Install
 
 You need [uv](https://docs.astral.sh/uv/) and Python 3.12 or newer.
@@ -132,7 +142,8 @@ family_faces/
   web/                  The interface: review.html plus the scripts and styles it loads
   export.py, portraits.py, morph.py, photo_gallery.py, people_filters.py, family.py
 tests/                  Python unittest and Node tests
-docs/DESIGN.md          Design notes for the interface
+docs/                   Design notes and README screenshots
+tools/demo-library/     Builds the made-up family used in the screenshots
 ```
 
 ## Development
