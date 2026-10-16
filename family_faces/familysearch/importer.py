@@ -97,8 +97,8 @@ def prepare(app,cache):
  return new_tree,new_labels,new_info,photos,mapping,report
 
 def main():
- parser=argparse.ArgumentParser();parser.add_argument('app',type=Path);parser.add_argument('cache',type=Path);parser.add_argument('--apply',action='store_true');args=parser.parse_args()
- app=args.app.resolve();cache=args.cache.resolve();root=config.LIBRARY;data=config.DATA
+ parser=argparse.ArgumentParser();parser.add_argument('cache',type=Path);parser.add_argument('--apply',action='store_true');args=parser.parse_args()
+ app=config.ROOT;cache=args.cache.resolve();root=config.LIBRARY;data=config.DATA
  tree,labels,info,photos,mapping,report=prepare(app,cache)
  report['photos_added']=0;report['photos_reused']=0;report['photo_associations']=0
  caption_links=read(cache/'caption-associations.json',[])

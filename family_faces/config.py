@@ -13,8 +13,9 @@ out of the library; the data folder only holds what the app derives from them.
 Optional settings in the same file:
   "album_name": label for the photos that were in the library before any import (default: the
                 library folder's name)
-  "familysearch": {"connection_script": "...", "upload_script": "..."}: Node scripts that connect
-                to FamilySearch. Without them the FamilySearch features stay switched off.
+  "familysearch": {"connection_script": "...", "upload_script": "..."}: replace the bundled
+                FamilySearch bridge with your own scripts. Without a built bridge or these
+                scripts, the FamilySearch features stay switched off.
 """
 
 import json
@@ -63,8 +64,13 @@ ALBUM_NAME = SETTINGS.get("album_name") or LIBRARY.name
 MODELS = HERE / "models"
 
 _fs = SETTINGS.get("familysearch") or {}
-FAMILYSEARCH_CONNECTION_SCRIPT = _path(os.environ.get("FAMILY_FACES_FS_CONNECTION_SCRIPT") or _fs.get("connection_script"))
-FAMILYSEARCH_UPLOAD_SCRIPT = _path(os.environ.get("FAMILY_FACES_FS_UPLOAD_SCRIPT") or _fs.get("upload_script"))
+# The bundled bridge (familysearch-bridge/) once it is built with `npm install && npm run build`.
+BRIDGE = HERE / "familysearch-bridge"
+_bridge = (lambda name: BRIDGE / "scripts" / name) if (BRIDGE / "build" / "index.js").exists() else (lambda name: None)
+FAMILYSEARCH_CONNECTION_SCRIPT = (_path(os.environ.get("FAMILY_FACES_FS_CONNECTION_SCRIPT") or _fs.get("connection_script"))
+                                  or _bridge("connection.mjs"))
+FAMILYSEARCH_UPLOAD_SCRIPT = (_path(os.environ.get("FAMILY_FACES_FS_UPLOAD_SCRIPT") or _fs.get("upload_script"))
+                              or _bridge("upload.mjs"))
 FAMILYSEARCH_ENABLED = bool(FAMILYSEARCH_UPLOAD_SCRIPT or FAMILYSEARCH_CONNECTION_SCRIPT)
 
 

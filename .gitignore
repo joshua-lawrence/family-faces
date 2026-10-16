@@ -30,3 +30,7 @@ originals_before_rotation/
 
 # Demo library tooling
 node_modules/
+
+# FamilySearch bridge
+familysearch-bridge/build/
+.familysearch-mcp/

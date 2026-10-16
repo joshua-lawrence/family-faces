@@ -139,10 +139,19 @@ side of the tree so a match lands in the right branch. Going the other way, once
 with the people I do know tagged, relatives working on that branch can see it and add the ones I
 don't. Suggestions are never applied on their own: I still accept each name.
 
-It talks to FamilySearch through two small Node scripts that you provide, which keep your sign-in
-outside the app. Add them under
-`"familysearch": {"connection_script": "...", "upload_script": "..."}`. Without them, the
-FamilySearch features stay switched off.
+The sync ships in [familysearch-bridge](familysearch-bridge), a small local server built on Jonathan
+Reiss's MIT-licensed [familysearch-mcp](https://github.com/JonathanReiss15/familysearch-mcp). It signs
+in with your own browser session, so there is no API key, and the session stays in
+`~/.familysearch-mcp/` on your computer, outside the app and this repository. To turn it on:
+
+```bash
+cd familysearch-bridge
+npm install && npm run build
+npm run login
+```
+
+The app finds the built bridge by itself. The bridge's [README](familysearch-bridge/README.md) lists
+the scripts for each direction: syncing the tree, downloading Memories, reading tags and uploading.
 
 ## Model licenses
 
@@ -162,9 +171,10 @@ family_faces/
   serve.py              The local web server (http://localhost:8765)
   api/                  One module per group of endpoints, loaded by serve.py
   pipeline/             Finding faces: detection, fingerprints, ages, grouping, the face map, Inbox imports
-  familysearch/         Optional FamilySearch tags, tree hints and uploads
+  familysearch/         FamilySearch tag import, tree merge, hints and uploads (Python side)
   web/                  The interface: review.html plus the scripts and styles it loads
   export.py, portraits.py, morph.py, photo_gallery.py, people_filters.py, family.py
+familysearch-bridge/    The two-way FamilySearch sync: a local MCP server with browser sign-in
 tests/                  Python unittest and Node tests
 docs/                   Design notes and README screenshots
 tools/demo-library/     Builds the made-up family used in the screenshots
@@ -175,4 +185,5 @@ tools/demo-library/     Builds the made-up family used in the screenshots
 ```bash
 uv run python -m unittest discover -s tests
 for f in tests/*.mjs; do node "$f"; done
+(cd familysearch-bridge && npm test)
 ```
